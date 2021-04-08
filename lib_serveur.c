@@ -113,7 +113,7 @@ void sendFifo2(t_joueur joueur, t_carte * carte) {
         exit(EXIT_FAILURE);
     }
     copie(main,carte,joueur.nombreCartes);
-    printf("taille pour le tableau : %ld\n", sizeof(main));
+    envoyerSignal1Joueur(joueur);
     write(entreeTube, carte, sizeof(t_carte)*joueur.nombreCartes);
 
 

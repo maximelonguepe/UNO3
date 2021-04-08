@@ -8,7 +8,7 @@ int id = 0;
 /*
  * definition des types et var globales utiles par la suite
  */
-//TODO : envoyer les tubes aux differents client en utilisant leurs id
+
 couleur couleurs[NBCOULEURS] = {"r", "b", "j", "v"};
 numero possibilites[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "2", "3", "4", "5", "6", "7",
                                        "8", "9"};
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     t_tas *tas1 = malloc(sizeof(t_tas));
 
     //segment pour le tableau de joueurs
-    key = ftok("serveur.c", 'R');
+    key = ftok("partie.txt", 'R');
     shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
     partie = shmat(shmid, (void *) 0, 0);
     partie->nombreJoueurs = 0;

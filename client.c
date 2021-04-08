@@ -14,11 +14,8 @@ int main(int argc, char *argv[]) {
     t_joueur joueur;
     t_tas * tas;
     key_t cle;
-    int media;
-    t_carte * carte1;
-    cle=ftok("carte.txt",'R');
-    media = shmget(cle, sizeof(carte1),0644|IPC_CREAT);
-    key = ftok("serveur.c", 'R');
+
+    key = ftok("partie.txt", 'R');
     shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
     partie = shmat(shmid, (void *) 0, 0);
     printf("Bonjour veuillez saisir votre pseudo : \n");
@@ -62,18 +59,6 @@ int main(int argc, char *argv[]) {
     printf("partie commencee tous les joueurs connectes\n");
     partie = shmat(shmid, (void *) 0, 0);
     affichageJoueursClient(partie);
-//    return (EXIT_SUCCESS);
-
-    char str[3];
-    sprintf(str, "%d", id);
-
-    int fd;
-
-    char myfifo[9];
-    strcpy(myfifo, "/tmp/");
-    strcat(myfifo, str);
-    t_carte *carte;
-
 
 
     n_sigusr1=0;
@@ -85,8 +70,8 @@ int main(int argc, char *argv[]) {
     tas=recupererTasPartagee(cle2);
     affichageDerniereCarteTas(tas);
     n_sigusr1=0;
-    sleep(2);
-
+   // sleep(1);
+    //while(n_sigusr1==0);
     recupererMain(partie->joueur[id]);
 
     return 0;
