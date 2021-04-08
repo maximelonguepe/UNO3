@@ -91,8 +91,6 @@ int main(int argc, char *argv[]) {
 
     cle2=genererCleTas();
     tas=recupererTasPartagee(cle2);
-    //printf("-----%d \n",tas->taille);
-    //afficherCarte(tas->cartes[0]);
     affichageDerniereCarteTas(tas);
 
     return 0;
