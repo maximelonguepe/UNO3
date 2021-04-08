@@ -158,6 +158,7 @@ void sendFifoCartes(t_partie *  partie, t_carte *mains) {
         //printf("Plage du joueur : %d à %d \n",positionActuelle,positionFinale);
         //copie(cartes,selectionneMain(positionActuelle,positionFinale,mains),partie->joueur[i].nombreCartes);
         selectionneMain(positionActuelle,positionFinale,mains,cartes);
+        printf("--->\n");
 
     }
 }
