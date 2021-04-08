@@ -92,26 +92,72 @@ void initTas(t_tas *tas) {
 }
 
 
-void sendFifo2(t_partie * partie) {
-    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        char str[3];
-        sprintf(str, "%d", i);
-        char myfifo[9];
-        strcpy(myfifo, "");
-        strcat(myfifo, str);
-        strcat(myfifo,".fifo");
-        int entreeTube;
-        printf("creation fifo : %s\n",myfifo);
+void sendFifo2(t_joueur joueur) {
+    int i = joueur.id;
+    char str[3];
+    sprintf(str, "%d", i);
+    char myfifo[9];
+    strcpy(myfifo, "");
+    strcat(myfifo, str);
+    strcat(myfifo, ".fifo");
+    int entreeTube;
+    printf("creation fifo : %s\n", myfifo);
 
 
-        t_carte carte;
-        strcpy(carte.couleur, "r");
-        strcpy(carte.numero_carte, "+2");
-        if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
-            printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
-            exit(EXIT_FAILURE);
-        }
-        write(entreeTube, &carte, sizeof(carte));
+    t_carte carte;
+    strcpy(carte.couleur, "r");
+    strcpy(carte.numero_carte, str);
+    if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
+        printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
+        exit(EXIT_FAILURE);
     }
+    write(entreeTube, &carte, sizeof(carte));
 
+
+}
+
+
+void sendFifoAllPlayers(t_partie *partie) {
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        sendFifo2(partie->joueur[i]);
+    }
+}
+
+int positionFinMainTableauMain(t_joueur joueur,int positionActuelle) {
+    return joueur.nombreCartes+positionActuelle;
+}
+
+void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination){
+    t_carte tab[fin-debut];
+    int j=0;
+    for (int i = debut; i < fin; ++i) {
+        afficherCarte(mains[i]);
+        destination[j]=mains[i];
+        j++;
+    }
+   // copie(destination,mains,fin-debut);
+    //return tab;
+
+}
+
+void copie(t_carte * mains, t_carte * section,int taille){
+    for (int i = 0; i <taille ; ++i) {
+        mains[i]=section[i];
+    }
+}
+
+
+void sendFifoCartes(t_partie *  partie, t_carte *mains) {
+    int positionActuelle=0;
+    int positionFinale=0;
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        printf("Joueur %d\n",i);
+        t_carte cartes[partie->joueur[i].nombreCartes];
+        positionActuelle=positionFinale;
+        positionFinale=positionFinMainTableauMain(partie->joueur[i],positionActuelle);
+        //printf("Plage du joueur : %d à %d \n",positionActuelle,positionFinale);
+        //copie(cartes,selectionneMain(positionActuelle,positionFinale,mains),partie->joueur[i].nombreCartes);
+        selectionneMain(positionActuelle,positionFinale,mains,cartes);
+
+    }
 }

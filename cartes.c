@@ -78,6 +78,7 @@ void afficherCarte(t_carte carte) {
     printf("%s\n", carte.couleur);
     printf("%s\n", carte.numero_carte);
     printf("---\n");
+    REINIT;
 }
 
 /*

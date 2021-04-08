@@ -40,6 +40,7 @@ void affichageCarteMilieu(t_carte carte) {
     print_milieu(numero);
 
     print_milieu("-----");
+    REINIT;
 }
 
 
@@ -114,29 +115,27 @@ void  recupererMain(int id){
     strcat(myfifo, str);
     strcat(myfifo,".fifo");
     t_carte carte;
-    printf("creation fifo : %s\n",myfifo);
 
     if (mkfifo(myfifo, 0777) != 0)
     {
         /*printf("SERVEUR - Impossible de créer le tube nommé \n");*/
         if ( errno == EEXIST)
         {
-            printf("SERVEUR - le tube nommé existe déjà \n");
+           // printf("SERVEUR - le tube nommé existe déjà \n");
         }
         else {
             exit(EXIT_FAILURE);
         }
     }
-    printf("Tube nommé présent \n");
     if ((sortieTube = open(myfifo,O_RDONLY)) == -1)
     {
         printf("SERVEUR - Impossible d'ouvrir la sortie du FIFO \n");
         exit(EXIT_FAILURE);
     }
-    printf("Tube nommé ouvert en lecture \n");
 
     read(sortieTube,&carte, sizeof(carte));
     afficherCarte(carte);
     close(sortieTube);
     //return &carte;
 }
+

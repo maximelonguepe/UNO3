@@ -43,7 +43,6 @@ void ajouterCarteTas(t_tas *tas, t_carte carte);
 
 t_tas *recupererTasPartagee(key_t cle2);
 
-
 void affichageDerniereCarteTas(t_tas *tas);
 
 void recupererMain(int id);
