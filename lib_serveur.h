@@ -24,7 +24,7 @@ void initTas(t_tas *tas);
 
 void envoyerSignal1Joueurs(t_partie *partie);
 
-void sendFifo2(t_joueur joueur);
+void sendFifo2(t_joueur joueur, t_carte * carte);
 
 void sendFifoAllPlayers(t_partie *partie);
 

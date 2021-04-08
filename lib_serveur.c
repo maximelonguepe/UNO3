@@ -43,9 +43,13 @@ int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
     }
 }
 
+void envoyerSignal1Joueur(t_joueur tJoueur){
+    kill(tJoueur.pid,SIGUSR1);
+}
+
 void envoyerSignal1Joueurs(t_partie *partie) {
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        kill(partie->joueur[i].pid, SIGUSR1);
+        envoyerSignal1Joueur(partie->joueur[i]);
     }
 }
 
@@ -92,7 +96,7 @@ void initTas(t_tas *tas) {
 }
 
 
-void sendFifo2(t_joueur joueur) {
+void sendFifo2(t_joueur joueur, t_carte * carte) {
     int i = joueur.id;
     char str[3];
     sprintf(str, "%d", i);
@@ -102,26 +106,25 @@ void sendFifo2(t_joueur joueur) {
     strcat(myfifo, ".fifo");
     int entreeTube;
     printf("creation fifo : %s\n", myfifo);
+    t_carte main[joueur.nombreCartes];
 
-
-    t_carte carte;
-    strcpy(carte.couleur, "r");
-    strcpy(carte.numero_carte, str);
     if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
         exit(EXIT_FAILURE);
     }
-    write(entreeTube, &carte, sizeof(carte));
+    copie(main,carte,joueur.nombreCartes);
+    printf("taille pour le tableau : %ld\n", sizeof(main));
+    write(entreeTube, carte, sizeof(t_carte)*joueur.nombreCartes);
 
 
 }
 
 
-void sendFifoAllPlayers(t_partie *partie) {
+/*void sendFifoAllPlayers(t_partie *partie) {
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
         sendFifo2(partie->joueur[i]);
     }
-}
+}*/
 
 int positionFinMainTableauMain(t_joueur joueur,int positionActuelle) {
     return joueur.nombreCartes+positionActuelle;
@@ -158,7 +161,6 @@ void sendFifoCartes(t_partie *  partie, t_carte *mains) {
         //printf("Plage du joueur : %d à %d \n",positionActuelle,positionFinale);
         //copie(cartes,selectionneMain(positionActuelle,positionFinale,mains),partie->joueur[i].nombreCartes);
         selectionneMain(positionActuelle,positionFinale,mains,cartes);
-        printf("--->\n");
-
+        sendFifo2(partie->joueur[i],cartes);
     }
 }

@@ -106,16 +106,17 @@ void affichageDerniereCarteTas(t_tas *tas) {
     affichageCarteMilieu(tas->cartes[tas->taille - 1]);
 }
 
-void  recupererMain(int id){
+void  recupererMain(t_joueur joueur){
     int sortieTube;
     char str[3];
-    sprintf(str, "%d", id);
+    sprintf(str, "%d", joueur.id);
     char myfifo[9];
     strcpy(myfifo, "");
     strcat(myfifo, str);
     strcat(myfifo,".fifo");
     t_carte carte;
-
+    t_carte cartes[joueur.nombreCartes];
+    printf("ouverture de : %s\n",myfifo);
     if (mkfifo(myfifo, 0777) != 0)
     {
         /*printf("SERVEUR - Impossible de créer le tube nommé \n");*/
@@ -132,9 +133,8 @@ void  recupererMain(int id){
         printf("SERVEUR - Impossible d'ouvrir la sortie du FIFO \n");
         exit(EXIT_FAILURE);
     }
-
-    read(sortieTube,&carte, sizeof(carte));
-    afficherCarte(carte);
+    read(sortieTube,cartes, sizeof(t_carte)*joueur.nombreCartes);
+    afficherCarte(cartes[6]);
     close(sortieTube);
     //return &carte;
 }

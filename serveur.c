@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     ajouterCarteTas(tas, *carte1);
     envoyerSignal1Joueurs(partie);
     //afficherCarte(tas->cartes[0]);
-    sendFifoAllPlayers(partie);
+    //sendFifoAllPlayers(partie);
     sendFifoCartes(partie,cartesJoueurs);
 
 

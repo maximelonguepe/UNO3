@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
     key_t key;
     int shmid;
-    t_partie *data;
+    t_partie *partie;
     t_joueur joueur;
     t_tas * tas;
     key_t cle;
@@ -20,24 +20,24 @@ int main(int argc, char *argv[]) {
     media = shmget(cle, sizeof(carte1),0644|IPC_CREAT);
     key = ftok("serveur.c", 'R');
     shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
-    data = shmat(shmid, (void *) 0, 0);
+    partie = shmat(shmid, (void *) 0, 0);
     printf("Bonjour veuillez saisir votre pseudo : \n");
     scanf("%s", joueur.nom);
     printf("écriture de \"%s\" en mémoire partagée\n", joueur.nom);
-    (data->nombreJoueurs)++;//ici
-    id = data->nombreJoueurs;
-    data->joueur[data->nombreJoueurs].id = id;
-    data->joueur[data->nombreJoueurs].pid = getpid();
-    strncpy(data->joueur[data->nombreJoueurs].nom, joueur.nom, TAILLE_SHM);
+    (partie->nombreJoueurs)++;//ici
+    id = partie->nombreJoueurs;
+    partie->joueur[partie->nombreJoueurs].id = id;
+    partie->joueur[partie->nombreJoueurs].pid = getpid();
+    strncpy(partie->joueur[partie->nombreJoueurs].nom, joueur.nom, TAILLE_SHM);
 
     key_t cle2;
 
 
-    printf("Nombre joueurs : %d \n", data->nombreJoueurs);
+    printf("Nombre joueurs : %d \n", partie->nombreJoueurs);
     printf("Vous avez l'id : %d \n", id);
     printf("Vous avez le pid : %d\n", getpid());
 
-    if (shmdt(data) == -1) {
+    if (shmdt(partie) == -1) {
         perror("shmdt");
         exit(1);
     }
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
     clrscr();
     REINIT;
     printf("partie commencee tous les joueurs connectes\n");
-    data = shmat(shmid, (void *) 0, 0);
-    affichageJoueursClient(data);
+    partie = shmat(shmid, (void *) 0, 0);
+    affichageJoueursClient(partie);
 //    return (EXIT_SUCCESS);
 
     char str[3];
@@ -84,9 +84,11 @@ int main(int argc, char *argv[]) {
     cle2=genererCleTas();
     tas=recupererTasPartagee(cle2);
     affichageDerniereCarteTas(tas);
-    sleep(1);
-    recupererMain(id);
+    n_sigusr1=0;
     sleep(2);
+
+    recupererMain(partie->joueur[id]);
+
     return 0;
 
 }

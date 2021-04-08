@@ -45,7 +45,7 @@ t_tas *recupererTasPartagee(key_t cle2);
 
 void affichageDerniereCarteTas(t_tas *tas);
 
-void recupererMain(int id);
+void  recupererMain(t_joueur joueur);
 
 
 
