@@ -73,15 +73,7 @@ int main(int argc, char *argv[]) {
     strcpy(myfifo, "/tmp/");
     strcat(myfifo, str);
     t_carte *carte;
-    /* open, read, and display the message from the FIFO */
-    /* printf("tentative lecture tube : %s\n",myfifo);
-     fd = open(myfifo, O_RDONLY);
-     printf("Taille carte : %ld\n", sizeof(carte)+5);
-     read(fd, carte, sizeof(carte));
-     afficherCarte(*carte);
-     close(fd);*/
 
-    // unlink(myfifo);
 
 
     n_sigusr1=0;
@@ -92,7 +84,9 @@ int main(int argc, char *argv[]) {
     cle2=genererCleTas();
     tas=recupererTasPartagee(cle2);
     affichageDerniereCarteTas(tas);
-
+    sleep(1);
+    recupererMain(id);
+    sleep(2);
     return 0;
 
 }

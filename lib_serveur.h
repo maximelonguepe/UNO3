@@ -12,3 +12,4 @@ void lancerPartie(t_partie * partie);
 void sendFifo(t_partie * partie,t_carte * carte);
 void initTas(t_tas * tas);
 void envoyerSignal1Joueurs(t_partie *partie);
+void sendFifo2();

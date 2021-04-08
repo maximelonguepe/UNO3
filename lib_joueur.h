@@ -47,5 +47,9 @@ key_t genererCleTas();
 
 void affichageDerniereCarteTas(t_tas *tas);
 
+void recupererMain(int id);
+
+
+
 
 

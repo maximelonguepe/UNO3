@@ -42,15 +42,16 @@ int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
             else return joueur.id - 1;
     }
 }
+
 void envoyerSignal1Joueurs(t_partie *partie) {
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
         kill(partie->joueur[i].pid, SIGUSR1);
     }
 }
-void lancerPartie(t_partie *partie){
+
+void lancerPartie(t_partie *partie) {
     envoyerSignal1Joueurs(partie);
 }
-
 
 
 void sendFifo(t_partie *partie, t_carte *carte) {
@@ -87,5 +88,30 @@ void sendFifo(t_partie *partie, t_carte *carte) {
 
 void initTas(t_tas *tas) {
     tas->taille = 0;
+
+}
+
+
+void sendFifo2(t_partie * partie) {
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        char str[3];
+        sprintf(str, "%d", i);
+        char myfifo[9];
+        strcpy(myfifo, "");
+        strcat(myfifo, str);
+        strcat(myfifo,".fifo");
+        int entreeTube;
+        printf("creation fifo : %s\n",myfifo);
+
+
+        t_carte carte;
+        strcpy(carte.couleur, "r");
+        strcpy(carte.numero_carte, "+2");
+        if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
+            printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
+            exit(EXIT_FAILURE);
+        }
+        write(entreeTube, &carte, sizeof(carte));
+    }
 
 }

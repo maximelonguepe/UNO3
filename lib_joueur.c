@@ -105,5 +105,38 @@ void affichageDerniereCarteTas(t_tas *tas) {
     affichageCarteMilieu(tas->cartes[tas->taille - 1]);
 }
 
+void  recupererMain(int id){
+    int sortieTube;
+    char str[3];
+    sprintf(str, "%d", id);
+    char myfifo[9];
+    strcpy(myfifo, "");
+    strcat(myfifo, str);
+    strcat(myfifo,".fifo");
+    t_carte carte;
+    printf("creation fifo : %s\n",myfifo);
 
+    if (mkfifo(myfifo, 0777) != 0)
+    {
+        /*printf("SERVEUR - Impossible de créer le tube nommé \n");*/
+        if ( errno == EEXIST)
+        {
+            printf("SERVEUR - le tube nommé existe déjà \n");
+        }
+        else {
+            exit(EXIT_FAILURE);
+        }
+    }
+    printf("Tube nommé présent \n");
+    if ((sortieTube = open(myfifo,O_RDONLY)) == -1)
+    {
+        printf("SERVEUR - Impossible d'ouvrir la sortie du FIFO \n");
+        exit(EXIT_FAILURE);
+    }
+    printf("Tube nommé ouvert en lecture \n");
 
+    read(sortieTube,&carte, sizeof(carte));
+    afficherCarte(carte);
+    close(sortieTube);
+    //return &carte;
+}
