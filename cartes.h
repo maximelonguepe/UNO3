@@ -14,7 +14,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
+#include "errno.h"
 #define NBCOULEURS 4
 #define NBPOSSIBILITES 15
 #define NBBOUCLECARTESTANDARD 2

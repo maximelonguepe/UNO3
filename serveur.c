@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     key_t key;
     int shmid;
     t_partie *partie;
-    t_tas * tas1=malloc(sizeof(t_tas));
+    t_tas *tas1 = malloc(sizeof(t_tas));
 
     //segment pour le tableau de joueurs
     key = ftok("serveur.c", 'R');
@@ -31,10 +31,10 @@ int main(int argc, char *argv[]) {
 
     key_t cle;
     int media;
-    t_carte * carte1;
-    cle=ftok("carte.txt",'R');
-    media = shmget(cle, sizeof(carte1),0644|IPC_CREAT);
-    carte1=shmat(media,(void * )0,0);
+    t_carte *carte1;
+    cle = ftok("carte.txt", 'R');
+    media = shmget(cle, sizeof(carte1), 0644 | IPC_CREAT);
+    carte1 = shmat(media, (void *) 0, 0);
 
 
     //tas = malloc(sizeof(t_tas));
@@ -63,25 +63,24 @@ int main(int argc, char *argv[]) {
     REINIT;
     afficherPioche(pioche);
     // recupération de la derniere carte et ajout au tas.
-    *carte1=pioche.pioche[pioche.nombreCarteRestante];
+    *carte1 = pioche.pioche[pioche.nombreCarteRestante];
     pioche.nombreCarteRestante--;
     clrscr();
     initTas(tas1);
-    ajouterCarteTas(tas1,*carte1);
+    ajouterCarteTas(tas1, *carte1);
     afficherCarte(tas1->cartes[0]);
 
     //segment pour le tas de carte
 
     key_t cle2;
-    t_tas * tas;
-    cle2=genererCleTas();
-    tas=recupererTasPartagee(cle2);
-    tas=malloc(sizeof(tas));
+    t_tas *tas;
+    cle2 = genererCleTas();
+    tas = recupererTasPartagee(cle2);
     initTas(tas);
-    ajouterCarteTas(tas,*carte1);
+    ajouterCarteTas(tas, *carte1);
     envoyerSignal1Joueurs(partie);
     //afficherCarte(tas->cartes[0]);
 
 
-    }
+}
 

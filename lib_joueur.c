@@ -56,6 +56,7 @@ void ajouterCarteTas(t_tas *tas, t_carte carte) {
 
 key_t genererCle(char *chaine) {
     key_t cle2 = ftok(chaine, 'R');
+    //printf("clee generee %d\n",cle2);
     return cle2;
 }
 
@@ -65,7 +66,37 @@ key_t genererCleTas() {
 
 t_tas *recupererTasPartagee(key_t cle2) {
     t_tas *tas;
-    int media2 = shmget(cle2, sizeof(t_tas), 0644);
+    int media2 = shmget(cle2, sizeof(t_tas), 0777| IPC_CREAT);
+    //printf("media 2 : %d\n",media2);
+    switch errno{
+        case EACCES :
+            printf("----1\n");
+            break;
+        case EEXIST:
+            printf("----2\n");
+            break;
+        case EINVAL:
+            printf("----3\n");
+            break;
+
+        case ENFILE :
+            printf("----4\n");
+            break;
+        case ENOENT:
+            printf("----5\n");
+            break;
+        case ENOMEM:
+            printf("----6\n");
+            break;
+
+        case ENOSPC :
+            printf("----7\n");
+            break;
+        case EPERM:
+            printf("----8\n");
+            break;
+
+    }
     tas = shmat(media2, (void *) 0, 0);
     return tas;
 }

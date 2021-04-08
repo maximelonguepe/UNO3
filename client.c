@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     strncpy(data->joueur[data->nombreJoueurs].nom, joueur.nom, TAILLE_SHM);
 
     key_t cle2;
-   cle2=genererCleTas();
+
 
     printf("Nombre joueurs : %d \n", data->nombreJoueurs);
     printf("Vous avez l'id : %d \n", id);
@@ -89,11 +89,11 @@ int main(int argc, char *argv[]) {
 
     }
 
-
+    cle2=genererCleTas();
     tas=recupererTasPartagee(cle2);
-    printf("-----%d \n",tas->taille);
+    //printf("-----%d \n",tas->taille);
     //afficherCarte(tas->cartes[0]);
-    //affichageDerniereCarteTas(tas);
+    affichageDerniereCarteTas(tas);
 
     return 0;
 
