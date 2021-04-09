@@ -58,38 +58,6 @@ void lancerPartie(t_partie *partie) {
 }
 
 
-void sendFifo(t_partie *partie, t_carte *carte) {
-    printf("toto\n");
-    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        char str[3];
-        sprintf(str, "%d", i);
-
-        int fd;
-
-        char myfifo[9];
-        strcpy(myfifo, "/tmp/");
-        strcat(myfifo, str);
-        printf("envoi tube a  : %s\n", myfifo);
-        /* create the FIFO (named pipe) */
-        mkfifo(myfifo, 0666);
-        /* write "Hi" to the FIFO */
-        fd = open(myfifo, O_WRONLY);
-        printf("Taille carte : %ld\n", sizeof(carte) + 2);
-        write(fd, carte, sizeof(carte) + 2);
-        close(fd);
-
-        /* remove the FIFO */
-        //unlink(myfifo);
-
-
-
-    }
-
-
-}
-
-//t_carte *  affecterPremiereCarteTas(t_pioche * pioche, )
-
 void initTas(t_tas *tas) {
     tas->taille = 0;
 
@@ -120,11 +88,6 @@ void sendFifo2(t_joueur joueur, t_carte * carte) {
 }
 
 
-/*void sendFifoAllPlayers(t_partie *partie) {
-    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        sendFifo2(partie->joueur[i]);
-    }
-}*/
 
 int positionFinMainTableauMain(t_joueur joueur,int positionActuelle) {
     return joueur.nombreCartes+positionActuelle;
@@ -138,8 +101,6 @@ void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination){
         destination[j]=mains[i];
         j++;
     }
-   // copie(destination,mains,fin-debut);
-    //return tab;
 
 }
 
@@ -158,8 +119,6 @@ void sendFifoCartes(t_partie *  partie, t_carte *mains) {
         t_carte cartes[partie->joueur[i].nombreCartes];
         positionActuelle=positionFinale;
         positionFinale=positionFinMainTableauMain(partie->joueur[i],positionActuelle);
-        //printf("Plage du joueur : %d à %d \n",positionActuelle,positionFinale);
-        //copie(cartes,selectionneMain(positionActuelle,positionFinale,mains),partie->joueur[i].nombreCartes);
         selectionneMain(positionActuelle,positionFinale,mains,cartes);
         sendFifo2(partie->joueur[i],cartes);
     }

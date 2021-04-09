@@ -67,9 +67,9 @@ key_t genererCleTas() {
 
 t_tas *recupererTasPartagee(key_t cle2) {
     t_tas *tas;
-    int media2 = shmget(cle2, sizeof(t_tas), 0777| IPC_CREAT);
+    int media2 = shmget(cle2, sizeof(t_tas), 0777 | IPC_CREAT);
     //printf("media 2 : %d\n",media2);
-    switch errno{
+    switch errno {
         case EACCES :
             printf("----1\n");
             break;
@@ -106,36 +106,81 @@ void affichageDerniereCarteTas(t_tas *tas) {
     affichageCarteMilieu(tas->cartes[tas->taille - 1]);
 }
 
-void  recupererMain(t_joueur joueur){
+void affichageHautCartes(t_carte *cartes, int nombreCartes) {
+    char chaine[10000];
+    strcpy(chaine, "");
+    for (int i = 0; i < nombreCartes; ++i) {
+
+        //strcat(chaine,"-----\t");
+        affichageCouleur(cartes[i].couleur);
+        printf("-----\t");
+        REINIT;
+    }
+    printf("\n");
+}
+
+void affichageCouleurMain(t_carte *cartes, int nombreCartes) {
+    for (int i = 0; i < nombreCartes; ++i) {
+        affichageCouleur(cartes[i].couleur);
+        printf("- ");
+        printf("%s", cartes[i].couleur);
+        printf(" -\t");
+        REINIT;
+    }
+    printf("\n");
+}
+
+void affichageNumeroMain(t_carte *cartes, int nombreCartes) {
+    for (int i = 0; i < nombreCartes; ++i) {
+        affichageCouleur(cartes[i].couleur);
+        printf("- ");
+        printf("%s", cartes[i].numero_carte);
+        printf(" -\t");
+        REINIT;
+    }
+    printf("\n");
+
+}
+
+
+void affichageMain2(t_carte *cartes, t_joueur joueur) {
+    affichageHautCartes(cartes, joueur.nombreCartes);
+    affichageCouleurMain(cartes, joueur.nombreCartes);
+    affichageNumeroMain(cartes, joueur.nombreCartes);
+    affichageHautCartes(cartes, joueur.nombreCartes);
+
+}
+
+void recupererMain(t_joueur joueur) {
     int sortieTube;
     char str[3];
     sprintf(str, "%d", joueur.id);
     char myfifo[9];
     strcpy(myfifo, "");
     strcat(myfifo, str);
-    strcat(myfifo,".fifo");
+    strcat(myfifo, ".fifo");
     t_carte carte;
     t_carte cartes[joueur.nombreCartes];
-    printf("ouverture de : %s\n",myfifo);
-    if (mkfifo(myfifo, 0777) != 0)
-    {
+    //printf("ouverture de : %s\n", myfifo);
+    if (mkfifo(myfifo, 0777) != 0) {
         /*printf("SERVEUR - Impossible de créer le tube nommé \n");*/
-        if ( errno == EEXIST)
-        {
-           // printf("SERVEUR - le tube nommé existe déjà \n");
-        }
-        else {
+        if (errno == EEXIST) {
+            // printf("SERVEUR - le tube nommé existe déjà \n");
+        } else {
             exit(EXIT_FAILURE);
         }
     }
-    if ((sortieTube = open(myfifo,O_RDONLY)) == -1)
-    {
+    if ((sortieTube = open(myfifo, O_RDONLY)) == -1) {
         printf("SERVEUR - Impossible d'ouvrir la sortie du FIFO \n");
         exit(EXIT_FAILURE);
     }
-    read(sortieTube,cartes, sizeof(t_carte)*joueur.nombreCartes);
-    afficherCarte(cartes[6]);
+    read(sortieTube, cartes, sizeof(t_carte) * joueur.nombreCartes);
+    //afficherCarte(cartes[6]);
+    affichageMain2(cartes, joueur);
     close(sortieTube);
     //return &carte;
 }
+
+
+
 
