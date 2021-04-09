@@ -43,10 +43,52 @@ int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
     }
 }
 
-void envoyerSignal1Joueur(t_joueur tJoueur){
-    printf("envoie message \n");
-    kill(tJoueur.pid,SIGUSR1);
-    printf("message envoyé\n");
+void * functionThreadPartieServer(void *pVoid){
+    sleep(1);
+    struct sigaction newact;
+    envoyerSignal1Joueur(jouant);
+    newact.sa_handler=MONSIGServer;
+    sigemptyset(&newact.sa_mask);
+    sigaction(SIGUSR1,&newact,NULL);
+    sigaction(SIGALRM,&newact,NULL);
+    sigaction(SIGUSR2,&newact,NULL);
+    printf("INFO : Attente des informations du serveur ;\n");
+
+    while (1){
+        sleep(20000);
+    }
+
+    pthread_exit(0);
+}
+
+void MONSIGServer(int num){
+
+    struct data_t *memoryShared;
+    int retour_jouer_carte;
+    key_t key;
+    int shmid;
+    t_partie *partie;
+    switch(num){
+        case SIGUSR1:
+            key = ftok("partie.txt", 'R');
+            shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
+            partie = shmat(shmid, (void *) 0, 0);
+            printf("signal recu sigusr1 \n");
+            jouant=partie->joueur[joueurSuivant(partie,jouant,0)];
+            envoyerSignal1Joueur(jouant);
+            break;
+        case SIGUSR2:
+            printf("sig recu sigusr2\n");
+            break;
+
+        case SIGALRM:
+            printf("sig recu sigalarm\n");
+
+            break;
+
+        default:
+            break;
+    }
 }
 
 void envoyerSignal1Joueurs(t_partie *partie) {

@@ -5,12 +5,14 @@
 #define TAILLE_SHM 1024
 #define MAXCARTES 20
 
+int pidServer;
 typedef struct {
     int id;
     int pid;
     int nombreCartes;
     char nom[MAXPSEUDO];
 } t_joueur;
+t_joueur jouant;
 
 typedef struct {
     int nombreJoueurs;
@@ -55,11 +57,19 @@ t_carte *recupererMain(t_joueur joueur, t_carte *mainJoueur);
 
 void affichageMain2(t_carte *cartes, t_joueur joueur);
 
+void envoyerSignal1Joueur(t_joueur tJoueur);
+
 int partieTerminee(t_partie *partie);
 
 void affichageClient(t_partie *partie, t_tas *tas, t_carte *mainDepart, int id);
 
-void sendSigusr1Server(t_partie * partie);
+void sendSigusr1Server(int pid);
+
+void *functionThreadPartie(void *pVoid);
+
+void MONSIG(int num);
+
+void refreshPartie(t_partie *partie);
 
 
 

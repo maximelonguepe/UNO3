@@ -216,8 +216,72 @@ t_carte * recupererMain(t_joueur joueur,t_carte * mainJoueur) {
 }
 
 
-void sendSigusr1Server(t_partie * partie){
-    kill(partie->joueur[0].pid,SIGUSR1);
+void sendSigusr1Server(int pid){
+    kill(pid,SIGUSR1);
+}
+void envoyerSignal1Joueur(t_joueur tJoueur){
+    printf("envoie message \n");
+    kill(tJoueur.pid,SIGUSR1);
+    printf("message envoyé\n");
+}
+void * functionThreadPartie(void *pVoid){
+
+    struct sigaction newact;
+    newact.sa_handler=MONSIG;
+    sigemptyset(&newact.sa_mask);
+    sigaction(SIGUSR1,&newact,NULL);
+    sigaction(SIGALRM,&newact,NULL);
+    sigaction(SIGUSR2,&newact,NULL);
+    //printf("INFO : Attente des informations du serveur ;\n");
+
+    while (1){
+        sleep(20000);
+    }
+
+    pthread_exit(0);
+}
+
+
+void refreshPartie(t_partie * partie){
+    key_t key;
+    int shmid;
+    key = ftok("partie.txt", 'R');
+    shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
+    partie = shmat(shmid, (void *) 0, 0);
+}
+
+
+
+
+
+
+
+void MONSIG(int num){
+
+    struct data_t *memoryShared;
+    int retour_jouer_carte;
+    char reponse[5];
+    switch(num){
+
+        case SIGUSR1:
+            //sendSigusr1Server(pidServer);
+            //printf("signal recu sigusr1 \n");
+            printf("Veuillez saisir la carte que vous souhaitez jouer \n");
+            scanf("%s",reponse);
+            sendSigusr1Server(pidServer);
+            break;
+        case SIGUSR2:
+            printf("sig recu sigusr2\n");
+            break;
+
+        case SIGALRM:
+            printf("sig recu sigalarm\n");
+
+            break;
+
+        default:
+            break;
+    }
 }
 
 

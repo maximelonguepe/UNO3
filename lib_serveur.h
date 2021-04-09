@@ -24,16 +24,19 @@ void initTas(t_tas *tas);
 
 void envoyerSignal1Joueurs(t_partie *partie);
 
-void sendFifo2(t_joueur joueur, t_carte * carte);
+void sendFifo2(t_joueur joueur, t_carte *carte);
 
 void sendFifoAllPlayers(t_partie *partie);
 
 int positionFinMainTableauMain(t_joueur joueur, int positionActuelle);
 
-void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination);
+void selectionneMain(int debut, int fin, t_carte *mains, t_carte *destination);
 
 void sendFifoCartes(t_partie *partie, t_carte *mains);
 
-void envoyerSignal1Joueur(t_joueur tJoueur);
+void MONSIGServer(int num);
+
+void *functionThreadPartieServer(void *pVoid);
+
 
 

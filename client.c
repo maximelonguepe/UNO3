@@ -5,6 +5,7 @@ volatile sig_atomic_t n_sigusr1 = 0;
 volatile sig_atomic_t n_sigusr2 = 0;
 
 static void sig_handler(int);
+
 /*TODO : pour jouer une carte :
  * vérifier que la carte est presente dans la main du joueur
  * vérifier que la carte est possible a jouer
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
     int shmid;
     t_partie *partie;
     t_joueur joueur;
-    t_tas * tas;
+    t_tas *tas;
     key_t cle;
     t_carte mainDepart[MAINDEPART];
     key = ftok("partie.txt", 'R');
@@ -67,34 +68,33 @@ int main(int argc, char *argv[]) {
     //affichageJoueursClient(partie);
 
 
-    n_sigusr1=0;
-    while(n_sigusr1==0){
+    n_sigusr1 = 0;
+    while (n_sigusr1 == 0) {
 
     }
 
-    cle2=genererCleTas();
-    tas=recupererTasPartagee(cle2);
-   // affichageDerniereCarteTas(tas);
-    n_sigusr1=0;
-   // sleep(1);
+    cle2 = genererCleTas();
+    tas = recupererTasPartagee(cle2);
+    // affichageDerniereCarteTas(tas);
+    n_sigusr1 = 0;
+    // sleep(1);
     //while(n_sigusr1==0);
-    recupererMain(partie->joueur[id],mainDepart);
+    recupererMain(partie->joueur[id], mainDepart);
     //affichageMain2(mainDepart,partie->joueur[id]);
-    affichageClient(partie,tas,mainDepart,id);
-    n_sigusr1=0;
-    n_sigusr2=0;
+    affichageClient(partie, tas, mainDepart, id);
+    n_sigusr1 = 0;
+    n_sigusr2 = 0;
     char reponse[5];
-    while (!partieTerminee(partie)) {
-        n_sigusr1=0;
-        while(n_sigusr1==0){
+    pidServer=partie->joueur[0].pid;
+    n_sigusr1 = 0;
+    pthread_t threadPartie;
+    pthread_create(&threadPartie, NULL, functionThreadPartie, NULL);
+    //printf("C'est a votre tour quelle carte voulez vous jouer ? \n");
+    //scanf("%s",reponse);
 
-        }
-        sleep(1);
-        printf("C'est a votre tour quelle carte voulez vous jouer ? \n");
-        scanf("%s",reponse);
-
-    }
-        return 0;
+    void *ret;
+    pthread_join(threadPartie, &ret);
+    return 0;
 
 }
 
