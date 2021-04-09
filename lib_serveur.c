@@ -44,7 +44,9 @@ int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
 }
 
 void envoyerSignal1Joueur(t_joueur tJoueur){
+    printf("envoie message \n");
     kill(tJoueur.pid,SIGUSR1);
+    printf("message envoyé\n");
 }
 
 void envoyerSignal1Joueurs(t_partie *partie) {

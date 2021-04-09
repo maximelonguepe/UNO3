@@ -67,7 +67,7 @@ typedef struct {
     t_carte pioche[117];
     int nombreCarteRestante;
 } t_pioche;
-
+void get_win_value(int *col, int *win);
 void listeCouleurs(couleur * couleurs);
 void listePossibilites(numero * possibilites);
 void affecterCouleur(couleur c, t_carte *card);

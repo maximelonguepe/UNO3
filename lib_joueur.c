@@ -14,6 +14,15 @@ void listageJoueurs(t_joueur *joueur, int nbJoueurs) {
     }
 }
 
+
+int partieTerminee(t_partie * partie){
+
+    for (int i = 1; i <=partie->nombreJoueurs ; ++i) {
+        if(partie->joueur[i].nombreCartes==0)return 1;
+    }
+    return 0;
+}
+
 void affichageJoueursClient(t_partie *partie) {
     char str[3];
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
@@ -142,8 +151,25 @@ void affichageNumeroMain(t_carte *cartes, int nombreCartes) {
 
 }
 
+int nombreDeCarteSuperieurLigne(int nombreCartes){
+    int tailletxt=0;
+    int col;
+    int lignes;
+    for (int i = 0; i < nombreCartes; ++i) {
+        tailletxt+=10;
+    }
+    get_win_value(&col,&lignes);
+
+    if (col<tailletxt){
+        return 1;
+    }
+    return 0;
+}
+
 
 void affichageMain2(t_carte *cartes, t_joueur joueur) {
+
+
     affichageHautCartes(cartes, joueur.nombreCartes);
     affichageCouleurMain(cartes, joueur.nombreCartes);
     affichageNumeroMain(cartes, joueur.nombreCartes);
@@ -151,7 +177,14 @@ void affichageMain2(t_carte *cartes, t_joueur joueur) {
 
 }
 
-void recupererMain(t_joueur joueur) {
+void affichageClient(t_partie * partie,t_tas * tas, t_carte * mainDepart,int id){
+    affichageJoueursClient(partie);
+    affichageDerniereCarteTas(tas);
+    affichageMain2(mainDepart,partie->joueur[id]);
+
+}
+
+t_carte * recupererMain(t_joueur joueur,t_carte * mainJoueur) {
     int sortieTube;
     char str[3];
     sprintf(str, "%d", joueur.id);
@@ -174,13 +207,18 @@ void recupererMain(t_joueur joueur) {
         printf("SERVEUR - Impossible d'ouvrir la sortie du FIFO \n");
         exit(EXIT_FAILURE);
     }
-    read(sortieTube, cartes, sizeof(t_carte) * joueur.nombreCartes);
+
+    read(sortieTube, mainJoueur, sizeof(t_carte) * joueur.nombreCartes);
     //afficherCarte(cartes[6]);
-    affichageMain2(cartes, joueur);
+    //affichageMain2(mainJoueur, joueur);
     close(sortieTube);
-    //return &carte;
+    //return cartes;
 }
 
+
+void sendSigusr1Server(t_partie * partie){
+    kill(partie->joueur[0].pid,SIGUSR1);
+}
 
 
 

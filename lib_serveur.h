@@ -34,4 +34,6 @@ void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination);
 
 void sendFifoCartes(t_partie *partie, t_carte *mains);
 
+void envoyerSignal1Joueur(t_joueur tJoueur);
+
 

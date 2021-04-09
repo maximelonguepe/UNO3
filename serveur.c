@@ -14,13 +14,24 @@ numero possibilites[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "
                                        "8", "9"};
 t_pioche pioche;
 t_carte *cartesJoueurs;
-
-
+t_joueur jouant;
+volatile sig_atomic_t n_sigusr1 = 0;
+volatile sig_atomic_t n_sigusr2 = 0;
+static void sig_handler(int signum);
 int main(int argc, char *argv[]) {
     key_t key;
     int shmid;
     t_partie *partie;
     t_tas *tas1 = malloc(sizeof(t_tas));
+
+    if (signal(SIGUSR1, sig_handler) == SIG_ERR) {
+        perror("signal");
+        exit(EXIT_FAILURE);
+    }
+    if (signal(SIGUSR2, sig_handler) == SIG_ERR) {
+        perror("signal");
+        exit(EXIT_FAILURE);
+    }
 
     //segment pour le tableau de joueurs
     key = ftok("partie.txt", 'R');
@@ -35,7 +46,8 @@ int main(int argc, char *argv[]) {
     cle = ftok("carte.txt", 'R');
     media = shmget(cle, sizeof(carte1), 0644 | IPC_CREAT);
     carte1 = shmat(media, (void *) 0, 0);
-
+    partie->joueur[0].pid=getpid();
+    strcpy(partie->joueur[0].nom,"serveur");
 
     //tas = malloc(sizeof(t_tas));
 
@@ -66,11 +78,6 @@ int main(int argc, char *argv[]) {
     *carte1 = pioche.pioche[pioche.nombreCarteRestante];
     pioche.nombreCarteRestante--;
     clrscr();
-    initTas(tas1);
-    ajouterCarteTas(tas1, *carte1);
-    afficherCarte(tas1->cartes[0]);
-
-    //segment pour le tas de carte
 
     key_t cle2;
     t_tas *tas;
@@ -82,7 +89,31 @@ int main(int argc, char *argv[]) {
     //afficherCarte(tas->cartes[0]);
     //sendFifoAllPlayers(partie);
     sendFifoCartes(partie,cartesJoueurs);
+    printf("---- taille pioche : %d\n",pioche.nombreCarteRestante);
+    jouant=partie->joueur[1];
+    int inverse=0;
+    while (!partieTerminee(partie)){
+        printf("envoi message boucle\n");
+        envoyerSignal1Joueur(jouant);
+       // sleep(1);
+        while(n_sigusr1==0);
+        n_sigusr1=0;
+        //jouant=partie->joueur[joueurSuivant(partie,jouant,inverse)];
+    }
+
+}
+
+static void sig_handler(int signum) {
+
+    if (signum == SIGUSR1) {
+        n_sigusr1++;
+    } else {
 
 
+        char *msg = "Reçu signal inattendu\n";
+        write(STDERR_FILENO, msg, strlen(msg));
+        _exit(EXIT_FAILURE);
+
+    }
 }
 
