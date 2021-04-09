@@ -24,7 +24,11 @@ int main(int argc, char *argv[]) {
     t_carte mainDepart[MAINDEPART];
 
     key = genererClePartie();
-    partie=recupererPartiePartagee(key);
+
+
+    shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
+    partie = shmat(shmid, (void *) 0, 0);
+
     printf("Bonjour veuillez saisir votre pseudo : \n");
     scanf("%s", joueur.nom);
     printf("écriture de \"%s\" en mémoire partagée\n", joueur.nom);
