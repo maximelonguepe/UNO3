@@ -266,11 +266,6 @@ void refreshPartie(t_partie * partie){
 }
 
 
-
-
-
-
-
 void MONSIG(int num){
 
     struct data_t *memoryShared;
