@@ -21,7 +21,7 @@
 #define NBBOUCLEZERO 1
 #define NBBOUCLECARTESJOKER 1
 #define TAILLEPIOCHE 107
-#define MAINDEPART 25
+#define MAINDEPART 7
 // Efface l'écran et replace le curseur en haut à gauche
 #ifndef COULEURS
 #define COULEURS
