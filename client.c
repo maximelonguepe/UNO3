@@ -22,13 +22,13 @@ int main(int argc, char *argv[]) {
     t_tas *tas;
     key_t cle;
     t_carte mainDepart[MAINDEPART];
-    key = ftok("partie.txt", 'R');
-    shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
-    partie = shmat(shmid, (void *) 0, 0);
+
+    key = genererClePartie();
+    partie=recupererPartiePartagee(key);
     printf("Bonjour veuillez saisir votre pseudo : \n");
     scanf("%s", joueur.nom);
     printf("écriture de \"%s\" en mémoire partagée\n", joueur.nom);
-    (partie->nombreJoueurs)++;//ici
+    (partie->nombreJoueurs)++;
     id = partie->nombreJoueurs;
     partie->joueur[partie->nombreJoueurs].id = id;
     partie->joueur[partie->nombreJoueurs].pid = getpid();
@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
         perror("signal");
         exit(EXIT_FAILURE);
     }
-    //attente du debut de partie
     CLIGNOTE;
     ROUGE;
     printf("en attente de joueurs");
@@ -65,22 +64,14 @@ int main(int argc, char *argv[]) {
     REINIT;
     printf("partie commencee tous les joueurs connectes\n");
     partie = shmat(shmid, (void *) 0, 0);
-    //affichageJoueursClient(partie);
-
 
     n_sigusr1 = 0;
     while (n_sigusr1 == 0) {
 
     }
-
     cle2 = genererCleTas();
     tas = recupererTasPartagee(cle2);
-    // affichageDerniereCarteTas(tas);
-    n_sigusr1 = 0;
-    // sleep(1);
-    //while(n_sigusr1==0);
     recupererMain(partie->joueur[id], mainDepart);
-    //affichageMain2(mainDepart,partie->joueur[id]);
     affichageClient(partie, tas, mainDepart, id);
     n_sigusr1 = 0;
     n_sigusr2 = 0;
@@ -89,8 +80,6 @@ int main(int argc, char *argv[]) {
     n_sigusr1 = 0;
     pthread_t threadPartie;
     pthread_create(&threadPartie, NULL, functionThreadPartie, NULL);
-    //printf("C'est a votre tour quelle carte voulez vous jouer ? \n");
-    //scanf("%s",reponse);
 
     void *ret;
     pthread_join(threadPartie, &ret);

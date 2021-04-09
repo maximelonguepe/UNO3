@@ -69,6 +69,17 @@ key_t genererCle(char *chaine) {
     //printf("clee generee %d\n",cle2);
     return cle2;
 }
+key_t genererClePartie() {
+    return genererCle("partie.txt");
+}
+
+t_partie * recupererPartiePartagee(key_t key){
+    int shmid;
+    t_partie *partie;
+    shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
+    partie = shmat(shmid, (void *) 0, 0);
+    return partie;
+}
 
 key_t genererCleTas() {
     return genererCle("tas.txt");
@@ -110,6 +121,10 @@ t_tas *recupererTasPartagee(key_t cle2) {
     tas = shmat(media2, (void *) 0, 0);
     return tas;
 }
+
+
+
+
 
 void affichageDerniereCarteTas(t_tas *tas) {
     affichageCarteMilieu(tas->cartes[tas->taille - 1]);

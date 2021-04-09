@@ -68,12 +68,13 @@ void MONSIGServer(int num){
     key_t key;
     int shmid;
     t_partie *partie;
+    key = genererClePartie();
     switch(num){
         case SIGUSR1:
-            key = ftok("partie.txt", 'R');
-            shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
-            partie = shmat(shmid, (void *) 0, 0);
+
+            partie=recupererPartiePartagee(key);
             printf("signal recu sigusr1 \n");
+            //on change de joueur jouant
             jouant=partie->joueur[joueurSuivant(partie,jouant,0)];
             envoyerSignal1Joueur(jouant);
             break;

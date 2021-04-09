@@ -67,9 +67,13 @@ void sendSigusr1Server(int pid);
 
 void *functionThreadPartie(void *pVoid);
 
+key_t genererClePartie();
+
 void MONSIG(int num);
 
 void refreshPartie(t_partie *partie);
+
+t_partie * recupererPartiePartagee(key_t key);
 
 
 

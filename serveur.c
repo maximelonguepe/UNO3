@@ -96,13 +96,7 @@ int main(int argc, char *argv[]) {
     int inverse = 0;
     pthread_t threadPartie;
     pthread_create(&threadPartie, NULL, functionThreadPartieServer,NULL );
-    // printf("envoi message boucle\n");
-
-
-    // sleep(1);
-    //while(n_sigusr1==0);
     n_sigusr1 = 0;
-    //jouant=partie->joueur[joueurSuivant(partie,jouant,inverse)];
     sleep(10);
     void *ret;
     pthread_join(threadPartie, &ret);
