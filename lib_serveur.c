@@ -45,8 +45,11 @@ int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
 
 void * functionThreadPartieServer(void *pVoid){
     sleep(1);
+    key_t clePartie;
+    clePartie=genererClePartie();
+    t_partie * partie=recupererPartiePartagee(clePartie);
     struct sigaction newact;
-    envoyerSignal1Joueur(jouant);
+    envoyerSignal1Joueur(partie->jouant);
     newact.sa_handler=MONSIGServer;
     sigemptyset(&newact.sa_mask);
     sigaction(SIGUSR1,&newact,NULL);
@@ -66,17 +69,23 @@ void MONSIGServer(int num){
     struct data_t *memoryShared;
     int retour_jouer_carte;
     key_t key;
-    int shmid;
+    key=genererClePartie();
+    recupererPartiePartagee(key);
+    t_carte * cartesJoueurs;
     t_partie *partie;
     key = genererClePartie();
+    partie=recupererPartiePartagee(key);
+   // sendFifoCartes(partie, );
+
     switch(num){
         case SIGUSR1:
 
             partie=recupererPartiePartagee(key);
             printf("signal recu sigusr1 \n");
             //on change de joueur jouant
-            jouant=partie->joueur[joueurSuivant(partie,jouant,0)];
-            envoyerSignal1Joueur(jouant);
+            partie->jouant=partie->joueur[joueurSuivant(partie,partie->jouant,0)];
+
+            envoyerSignal1Joueur(partie->jouant);
             break;
         case SIGUSR2:
             printf("sig recu sigusr2\n");

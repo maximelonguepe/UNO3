@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     //sendFifoAllPlayers(partie);
     sendFifoCartes(partie, cartesJoueurs);
     printf("---- taille pioche : %d\n", pioche.nombreCarteRestante);
-    jouant = partie->joueur[1];
+    partie->jouant = partie->joueur[1];
     int inverse = 0;
     pthread_t threadPartie;
     pthread_create(&threadPartie, NULL, functionThreadPartieServer,NULL );

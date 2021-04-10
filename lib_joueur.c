@@ -89,7 +89,7 @@ t_tas *recupererTasPartagee(key_t cle2) {
     t_tas *tas;
     int media2 = shmget(cle2, sizeof(t_tas), 0777 | IPC_CREAT);
     //printf("media 2 : %d\n",media2);
-    switch errno {
+    /*switch errno {
         case EACCES :
             printf("----1\n");
             break;
@@ -117,12 +117,14 @@ t_tas *recupererTasPartagee(key_t cle2) {
             printf("----8\n");
             break;
 
-    }
+    }*/
     tas = shmat(media2, (void *) 0, 0);
     return tas;
 }
 
-
+t_carte recupererDerniereCarteTas(t_tas * tas){
+    return tas->cartes[tas->taille-1];
+}
 
 
 
@@ -226,7 +228,7 @@ t_carte * recupererMain(t_joueur joueur,t_carte * mainJoueur) {
     read(sortieTube, mainJoueur, sizeof(t_carte) * joueur.nombreCartes);
     //afficherCarte(cartes[6]);
     //affichageMain2(mainJoueur, joueur);
-    close(sortieTube);
+    //close(sortieTube);
     //return cartes;
 }
 
@@ -265,19 +267,48 @@ void refreshPartie(t_partie * partie){
     partie = shmat(shmid, (void *) 0, 0);
 }
 
+int estConforme(char *chaine){
+    if (strlen(chaine)>1&&strlen(chaine)<5){
+        return 1;
+    }
+    return 0;
+}
+
+
+
+
+int contains(char * chaine,t_joueur joueur){
+    t_carte main[joueur.nombreCartes];
+    recupererMain(joueur,main);
+
+}
 
 void MONSIG(int num){
 
     struct data_t *memoryShared;
     int retour_jouer_carte;
-    char reponse[5];
+    char reponse[6];
+    int conforme=0;
+    key_t cleTas;
+    t_tas * tas;
+    cleTas=genererCleTas();
+    tas=recupererTasPartagee(cleTas);
+    t_carte derniereCarteTas;
+    derniereCarteTas=recupererDerniereCarteTas(tas);
     switch(num){
 
         case SIGUSR1:
             //sendSigusr1Server(pidServer);
             //printf("signal recu sigusr1 \n");
-            printf("Veuillez saisir la carte que vous souhaitez jouer \n");
-            scanf("%s",reponse);
+
+            while(!conforme){
+                printf("Veuillez saisir la carte que vous souhaitez jouer \n");
+                scanf("%s",reponse);
+
+                conforme=estConforme(reponse);
+                //affichageDerniereCarteTas(tas);
+            }
+
             sendSigusr1Server(pidServer);
             break;
         case SIGUSR2:

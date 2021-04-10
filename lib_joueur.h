@@ -16,6 +16,7 @@ t_joueur jouant;
 
 typedef struct {
     int nombreJoueurs;
+    t_joueur jouant;
     t_joueur joueur[MAXJOUEURS];
 
 } t_partie;
