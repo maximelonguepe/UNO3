@@ -56,7 +56,6 @@ void * functionThreadPartieServer(void *pVoid){
     sigaction(SIGUSR1,&newact,NULL);
     sigaction(SIGALRM,&newact,NULL);
     sigaction(SIGUSR2,&newact,NULL);
-    printf("INFO : Attente des informations du serveur ;\n");
 
     while (1){
         sleep(20000);
@@ -85,7 +84,7 @@ void MONSIGServer(int num){
         case SIGUSR1:
 
             partie=recupererPartiePartagee(key);
-            printf("signal recu sigusr1 \n");
+           // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
             partie->jouant=partie->joueur[joueurSuivant(partie,partie->jouant,0)];
 
@@ -93,11 +92,11 @@ void MONSIGServer(int num){
             envoyerSignal2TousJoueursSauf1(*partie,partie->jouant);
             break;
         case SIGUSR2:
-            printf("sig recu sigusr2\n");
+            //printf("sig recu sigusr2\n");
             break;
 
         case SIGALRM:
-            printf("sig recu sigalarm\n");
+            //printf("sig recu sigalarm\n");
 
             break;
 
@@ -174,6 +173,7 @@ void envoyerSignal2TousJoueursSauf1(t_partie partie,t_joueur joueur){
         }
     }
 }
+//TODO le passer en memoire partagee trop de pb
 
 void sendFifoCartes(t_partie *  partie, t_carte *mains) {
     int positionActuelle=0;

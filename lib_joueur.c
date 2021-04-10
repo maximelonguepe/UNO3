@@ -43,6 +43,9 @@ int estpossibilite(char *possiblitess) {
 }
 
 int existe(char *chaine) {
+    if(strcmp(chaine,"pioche")==0){
+        return 1;
+    }
     if (strlen(chaine) <1 || strlen(chaine) >3)return 0;
     int couleurs = 0;
     char chainechouleur[5];
@@ -274,9 +277,9 @@ void sendSigusr1Server(t_partie *partie) {
 }
 
 void envoyerSignal1Joueur(t_joueur tJoueur) {
-    printf("envoie message \n");
+   // printf("envoie message \n");
     kill(tJoueur.pid, SIGUSR1);
-    printf("message envoyé\n");
+    //printf("message envoyé\n");
 }
 
 void copie(t_carte *mains, t_carte *section, int taille) {
@@ -346,7 +349,7 @@ void MONSIG(int num) {
 
         case SIGUSR1:
             affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
-            while (existanceCarte==0) {
+            while ((existanceCarte==0)) {
                 if(erreurSaisie){
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
@@ -357,9 +360,12 @@ void MONSIG(int num) {
                 existanceCarte=existe(reponse);
                 erreurSaisie=1;
 
+
             }
             erreurSaisie=0;
-            sendSigusr1Server(partie);
+            if(strcmp(reponse,"pioche")!=0){
+                sendSigusr1Server(partie);
+            }
             break;
         case SIGUSR2:
             affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
