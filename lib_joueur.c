@@ -327,6 +327,7 @@ void MONSIG(int num) {
     int retour_jouer_carte;
     char reponse[6];
     int conforme = 0;
+    int erreurSaisie=0;
     key_t cleTas;
     key_t clePartie;
     t_tas *tas;
@@ -344,20 +345,20 @@ void MONSIG(int num) {
     switch (num) {
 
         case SIGUSR1:
-            //sendSigusr1Server(pidServer);
-            //printf("signal recu sigusr1 \n");
             affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
             while (existanceCarte==0) {
-
+                if(erreurSaisie){
+                    ROUGE;
+                    printf("Tapez une carte existante ! \n");
+                    REINIT;
+                }
                 printf("Veuillez saisir la carte que vous souhaitez jouer \n");
                 scanf("%s", reponse);
-
                 existanceCarte=existe(reponse);
-                //printf("La carte existe ? : %d\n",existanceCarte);
-
+                erreurSaisie=1;
 
             }
-
+            erreurSaisie=0;
             sendSigusr1Server(partie);
             break;
         case SIGUSR2:
