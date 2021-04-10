@@ -50,6 +50,7 @@ void * functionThreadPartieServer(void *pVoid){
     t_partie * partie=recupererPartiePartagee(clePartie);
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
+    envoyerSignal2TousJoueursSauf1(*partie,partie->jouant);
     newact.sa_handler=MONSIGServer;
     sigemptyset(&newact.sa_mask);
     sigaction(SIGUSR1,&newact,NULL);
@@ -89,6 +90,7 @@ void MONSIGServer(int num){
             partie->jouant=partie->joueur[joueurSuivant(partie,partie->jouant,0)];
 
             envoyerSignal1Joueur(partie->jouant);
+            envoyerSignal2TousJoueursSauf1(*partie,partie->jouant);
             break;
         case SIGUSR2:
             printf("sig recu sigusr2\n");
@@ -161,8 +163,17 @@ void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination){
 
 }
 
+void envoyerSignal2Joueur(t_joueur joueur){
+    kill(joueur.pid,SIGUSR2);
+}
 
-
+void envoyerSignal2TousJoueursSauf1(t_partie partie,t_joueur joueur){
+    for (int i = 1; i <=partie.nombreJoueurs ; ++i) {
+        if(partie.joueur[i].id!=joueur.id){
+            envoyerSignal2Joueur(partie.joueur[i]);
+        }
+    }
+}
 
 void sendFifoCartes(t_partie *  partie, t_carte *mains) {
     int positionActuelle=0;
@@ -176,3 +187,5 @@ void sendFifoCartes(t_partie *  partie, t_carte *mains) {
         sendFifo2(partie->joueur[i],cartes);
     }
 }
+
+

@@ -40,5 +40,7 @@ void MONSIGServer(int num);
 
 void *functionThreadPartieServer(void *pVoid);
 
+void envoyerSignal2TousJoueursSauf1(t_partie partie,t_joueur joueur);
+
 
 
