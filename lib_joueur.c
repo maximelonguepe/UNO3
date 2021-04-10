@@ -1,6 +1,11 @@
 #include "lib_joueur.h"
-int * idClient;
-t_envoi * envoi;
+
+int *idClient;
+t_envoi *envoi;
+couleur coul[NBCOULEURS] = {"r", "b", "j", "v"};
+numero possi[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "2", "3", "4", "5", "6", "7",
+                                "8", "9"};
+
 void affichageJoueurJouant(t_partie *partie) {
     printf("Joueur en train de jouer : %s\n", partie->joueur[partie->jouant.id].nom);
 }
@@ -17,6 +22,55 @@ void listageJoueurs(t_joueur *joueur, int nbJoueurs) {
     for (int i = 1; i <= nbJoueurs; ++i) {
         affichageJoueur(joueur[i]);
     }
+}
+
+int estCouleur(char *couleur) {
+    for (int i = 0; i < NBCOULEURS; ++i) {
+        if (strcmp(couleur, coul[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int estpossibilite(char *possiblitess) {
+    for (int i = 0; i < NBPOSSIBILITES; ++i) {
+        if (strcmp(possiblitess, possi[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int existe(char *chaine) {
+    if (strlen(chaine) <1 || strlen(chaine) >3)return 0;
+    int couleurs = 0;
+    char chainechouleur[5];
+    char chainepossibilites[5];
+    if (strcmp("jo", chaine) == 0 || strcmp("+4", chaine) == 0) {
+        return 1;
+    } else {
+        chainechouleur[0] = chaine[0];
+        chainechouleur[1] = '\0';
+        if (!estCouleur(chainechouleur)) {
+            return 0;
+        } else {
+
+            chainepossibilites[0] = chaine[1];
+            if (strlen(chaine) == 2) {
+                chainepossibilites[1] = '\0';
+
+            } else {
+                chainepossibilites[1] = chaine[2];
+                chainepossibilites[2] = '\0';
+            }
+            return estpossibilite(chainepossibilites);
+
+        }
+
+    }
+
+
 }
 
 
@@ -94,36 +148,6 @@ key_t genererCleTas() {
 t_tas *recupererTasPartagee(key_t cle2) {
     t_tas *tas;
     int media2 = shmget(cle2, sizeof(t_tas), 0777 | IPC_CREAT);
-    //printf("media 2 : %d\n",media2);
-    /*switch errno {
-        case EACCES :
-            printf("----1\n");
-            break;
-        case EEXIST:
-            printf("----2\n");
-            break;
-        case EINVAL:
-            printf("----3\n");
-            break;
-
-        case ENFILE :
-            printf("----4\n");
-            break;
-        case ENOENT:
-            printf("----5\n");
-            break;
-        case ENOMEM:
-            printf("----6\n");
-            break;
-
-        case ENOSPC :
-            printf("----7\n");
-            break;
-        case EPERM:
-            printf("----8\n");
-            break;
-
-    }*/
     tas = shmat(media2, (void *) 0, 0);
     return tas;
 }
@@ -245,8 +269,8 @@ t_carte *recupererMain(t_joueur joueur, t_carte *mainJoueur) {
 }
 
 
-void sendSigusr1Server(int pid) {
-    kill(pid, SIGUSR1);
+void sendSigusr1Server(t_partie *partie) {
+    kill(partie->joueur[0].pid, SIGUSR1);
 }
 
 void envoyerSignal1Joueur(t_joueur tJoueur) {
@@ -255,9 +279,15 @@ void envoyerSignal1Joueur(t_joueur tJoueur) {
     printf("message envoyé\n");
 }
 
+void copie(t_carte *mains, t_carte *section, int taille) {
+    for (int i = 0; i < taille; ++i) {
+        mains[i] = section[i];
+    }
+}
+
 void *functionThreadPartie(void *pVoid) {
 
-    envoi=(t_envoi *)pVoid;
+    envoi = (t_envoi *) pVoid;
 
     struct sigaction newact;
 
@@ -284,12 +314,6 @@ void refreshPartie(t_partie *partie) {
     partie = shmat(shmid, (void *) 0, 0);
 }
 
-int estConforme(char *chaine) {
-    if (strlen(chaine) > 1 && strlen(chaine) < 5) {
-        return 1;
-    }
-    return 0;
-}
 
 
 int contains(char *chaine, t_joueur joueur) {
@@ -299,37 +323,45 @@ int contains(char *chaine, t_joueur joueur) {
 }
 
 void MONSIG(int num) {
-    struct data_t *memoryShared;
+
     int retour_jouer_carte;
     char reponse[6];
     int conforme = 0;
     key_t cleTas;
+    key_t clePartie;
     t_tas *tas;
+    t_partie *partie;
+    int existanceCarte=0;
     cleTas = genererCleTas();
     tas = recupererTasPartagee(cleTas);
     t_carte derniereCarteTas;
     derniereCarteTas = recupererDerniereCarteTas(tas);
-    printf("Vous avez l'id : %d\n",envoi->idClient);
+    printf("Vous avez l'id : %d\n", envoi->idClient);
+    clePartie = genererClePartie();
+    partie = recupererPartiePartagee(clePartie);
+
 
     switch (num) {
 
         case SIGUSR1:
             //sendSigusr1Server(pidServer);
             //printf("signal recu sigusr1 \n");
-
-            while (!conforme) {
+            affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
+            while (existanceCarte==0) {
 
                 printf("Veuillez saisir la carte que vous souhaitez jouer \n");
                 scanf("%s", reponse);
 
-                conforme = estConforme(reponse);
-                //affichageDerniereCarteTas(tas);
+                existanceCarte=existe(reponse);
+                //printf("La carte existe ? : %d\n",existanceCarte);
+
+
             }
 
-            sendSigusr1Server(pidServer);
+            sendSigusr1Server(partie);
             break;
         case SIGUSR2:
-            printf("sig recu sigusr2\n");
+            affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
             break;
 
         case SIGALRM:

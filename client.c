@@ -17,6 +17,7 @@ static void sig_handler(int);
  * */
 
 
+
 int main(int argc, char *argv[]) {
     t_envoi * envoi;
     envoi=malloc(sizeof(t_envoi));
@@ -88,9 +89,9 @@ int main(int argc, char *argv[]) {
     char reponse[5];
     pidServer=partie->joueur[0].pid;
     n_sigusr1 = 0;
-
+    envoi->main=malloc(sizeof(t_carte)*partie->joueur[id].nombreCartes);
+    copie(envoi->main,mainDepart,partie->joueur[id].nombreCartes);
     pthread_t threadPartie;
-
     pthread_create(&threadPartie, NULL, functionThreadPartie, (void *)envoi );
 
     void *ret;

@@ -23,6 +23,7 @@ typedef struct {
 
 typedef struct {
     int idClient;
+    t_carte * main;
 
 } t_envoi;
 
@@ -69,7 +70,7 @@ int partieTerminee(t_partie *partie);
 
 void affichageClient(t_partie *partie, t_tas *tas, t_carte *mainDepart, int id);
 
-void sendSigusr1Server(int pid);
+void sendSigusr1Server(t_partie * partie);
 
 void *functionThreadPartie(void *pVoid);
 
@@ -81,7 +82,7 @@ void refreshPartie(t_partie *partie);
 
 t_partie * recupererPartiePartagee(key_t key);
 
-
+void copie(t_carte * mains, t_carte * section,int taille);
 
 
 

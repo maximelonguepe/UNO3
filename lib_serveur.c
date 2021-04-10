@@ -161,11 +161,7 @@ void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination){
 
 }
 
-void copie(t_carte * mains, t_carte * section,int taille){
-    for (int i = 0; i <taille ; ++i) {
-        mains[i]=section[i];
-    }
-}
+
 
 
 void sendFifoCartes(t_partie *  partie, t_carte *mains) {

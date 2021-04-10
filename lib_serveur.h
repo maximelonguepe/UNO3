@@ -6,9 +6,10 @@ typedef struct {
 } t_message;
 
 void affichageJoueurJouant(t_partie *partie);
+
 void lancerPartie(t_partie *partie);
 
-void copie(t_carte *mains, t_carte *section, int taille);
+//void copie(t_carte *mains, t_carte *section, int taille);
 
 
 void distributionMainDepart(t_pioche *pioche, t_carte *carteJoueurs, t_partie *partie);
