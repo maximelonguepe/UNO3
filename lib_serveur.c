@@ -64,6 +64,9 @@ void * functionThreadPartieServer(void *pVoid){
     pthread_exit(0);
 }
 
+
+
+
 void MONSIGServer(int num){
 
     struct data_t *memoryShared;

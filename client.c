@@ -1,6 +1,8 @@
 #include "lib_joueur.h"
 
 int id;
+
+
 volatile sig_atomic_t n_sigusr1 = 0;
 volatile sig_atomic_t n_sigusr2 = 0;
 
@@ -13,8 +15,11 @@ static void sig_handler(int);
  * diminuer le nombre de cartes du joueur
  * reafficher propremment laffichage global des joueurs
  * */
-int main(int argc, char *argv[]) {
 
+
+int main(int argc, char *argv[]) {
+    t_envoi * envoi;
+    envoi=malloc(sizeof(t_envoi));
     key_t key;
     int shmid;
     t_partie *partie;
@@ -38,6 +43,7 @@ int main(int argc, char *argv[]) {
     partie->joueur[partie->nombreJoueurs].pid = getpid();
     strncpy(partie->joueur[partie->nombreJoueurs].nom, joueur.nom, TAILLE_SHM);
 
+    envoi->idClient=id;
     key_t cle2;
 
 
@@ -82,8 +88,10 @@ int main(int argc, char *argv[]) {
     char reponse[5];
     pidServer=partie->joueur[0].pid;
     n_sigusr1 = 0;
+
     pthread_t threadPartie;
-    pthread_create(&threadPartie, NULL, functionThreadPartie, NULL);
+
+    pthread_create(&threadPartie, NULL, functionThreadPartie, (void *)envoi );
 
     void *ret;
     pthread_join(threadPartie, &ret);

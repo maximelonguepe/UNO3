@@ -22,6 +22,11 @@ typedef struct {
 } t_partie;
 
 typedef struct {
+    int idClient;
+
+} t_envoi;
+
+typedef struct {
 
     t_carte cartes[108];
     int taille;

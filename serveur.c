@@ -14,7 +14,6 @@ numero possibilites[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "
                                        "8", "9"};
 t_pioche pioche;
 t_carte *cartesJoueurs;
-//t_joueur jouant;
 volatile sig_atomic_t n_sigusr1 = 0;
 volatile sig_atomic_t n_sigusr2 = 0;
 

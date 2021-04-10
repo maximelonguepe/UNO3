@@ -1,4 +1,9 @@
 #include "lib_joueur.h"
+int * idClient;
+t_envoi * envoi;
+void affichageJoueurJouant(t_partie *partie) {
+    printf("Joueur en train de jouer : %s\n", partie->joueur[partie->jouant.id].nom);
+}
 
 void affichageJoueur(t_joueur joueur) {
     printf("%s\n", joueur.nom);
@@ -15,10 +20,10 @@ void listageJoueurs(t_joueur *joueur, int nbJoueurs) {
 }
 
 
-int partieTerminee(t_partie * partie){
+int partieTerminee(t_partie *partie) {
 
-    for (int i = 1; i <=partie->nombreJoueurs ; ++i) {
-        if(partie->joueur[i].nombreCartes==0)return 1;
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        if (partie->joueur[i].nombreCartes == 0)return 1;
     }
     return 0;
 }
@@ -69,11 +74,12 @@ key_t genererCle(char *chaine) {
     //printf("clee generee %d\n",cle2);
     return cle2;
 }
+
 key_t genererClePartie() {
     return genererCle("partie.txt");
 }
 
-t_partie * recupererPartiePartagee(key_t key){
+t_partie *recupererPartiePartagee(key_t key) {
     int shmid;
     t_partie *partie;
     shmid = shmget(key, TAILLE_SHM, 0644 | IPC_CREAT);
@@ -122,10 +128,9 @@ t_tas *recupererTasPartagee(key_t cle2) {
     return tas;
 }
 
-t_carte recupererDerniereCarteTas(t_tas * tas){
-    return tas->cartes[tas->taille-1];
+t_carte recupererDerniereCarteTas(t_tas *tas) {
+    return tas->cartes[tas->taille - 1];
 }
-
 
 
 void affichageDerniereCarteTas(t_tas *tas) {
@@ -168,16 +173,16 @@ void affichageNumeroMain(t_carte *cartes, int nombreCartes) {
 
 }
 
-int nombreDeCarteSuperieurLigne(int nombreCartes){
-    int tailletxt=0;
+int nombreDeCarteSuperieurLigne(int nombreCartes) {
+    int tailletxt = 0;
     int col;
     int lignes;
     for (int i = 0; i < nombreCartes; ++i) {
-        tailletxt+=10;
+        tailletxt += 10;
     }
-    get_win_value(&col,&lignes);
+    get_win_value(&col, &lignes);
 
-    if (col<tailletxt){
+    if (col < tailletxt) {
         return 1;
     }
     return 0;
@@ -194,14 +199,21 @@ void affichageMain2(t_carte *cartes, t_joueur joueur) {
 
 }
 
-void affichageClient(t_partie * partie,t_tas * tas, t_carte * mainDepart,int id){
+void affichageClient(t_partie *partie, t_tas *tas, t_carte *mainDepart, int id) {
     affichageJoueursClient(partie);
     affichageDerniereCarteTas(tas);
-    affichageMain2(mainDepart,partie->joueur[id]);
+    affichageMain2(mainDepart, partie->joueur[id]);
 
 }
 
-t_carte * recupererMain(t_joueur joueur,t_carte * mainJoueur) {
+void affichageClientPartieCommencee(t_partie *partie, t_tas *tas, t_carte *mainDepart, int id) {
+    clrscr();
+    affichageJoueurJouant(partie);
+    affichageClient(partie, tas, mainDepart, id);
+}
+
+
+t_carte *recupererMain(t_joueur joueur, t_carte *mainJoueur) {
     int sortieTube;
     char str[3];
     sprintf(str, "%d", joueur.id);
@@ -233,25 +245,30 @@ t_carte * recupererMain(t_joueur joueur,t_carte * mainJoueur) {
 }
 
 
-void sendSigusr1Server(int pid){
-    kill(pid,SIGUSR1);
+void sendSigusr1Server(int pid) {
+    kill(pid, SIGUSR1);
 }
-void envoyerSignal1Joueur(t_joueur tJoueur){
+
+void envoyerSignal1Joueur(t_joueur tJoueur) {
     printf("envoie message \n");
-    kill(tJoueur.pid,SIGUSR1);
+    kill(tJoueur.pid, SIGUSR1);
     printf("message envoyé\n");
 }
-void * functionThreadPartie(void *pVoid){
+
+void *functionThreadPartie(void *pVoid) {
+
+    envoi=(t_envoi *)pVoid;
 
     struct sigaction newact;
-    newact.sa_handler=MONSIG;
+
+    newact.sa_handler = MONSIG;
     sigemptyset(&newact.sa_mask);
-    sigaction(SIGUSR1,&newact,NULL);
-    sigaction(SIGALRM,&newact,NULL);
-    sigaction(SIGUSR2,&newact,NULL);
+    sigaction(SIGUSR1, &newact, NULL);
+    sigaction(SIGALRM, &newact, NULL);
+    sigaction(SIGUSR2, &newact, NULL);
     //printf("INFO : Attente des informations du serveur ;\n");
 
-    while (1){
+    while (1) {
         sleep(20000);
     }
 
@@ -259,7 +276,7 @@ void * functionThreadPartie(void *pVoid){
 }
 
 
-void refreshPartie(t_partie * partie){
+void refreshPartie(t_partie *partie) {
     key_t key;
     int shmid;
     key = ftok("partie.txt", 'R');
@@ -267,45 +284,45 @@ void refreshPartie(t_partie * partie){
     partie = shmat(shmid, (void *) 0, 0);
 }
 
-int estConforme(char *chaine){
-    if (strlen(chaine)>1&&strlen(chaine)<5){
+int estConforme(char *chaine) {
+    if (strlen(chaine) > 1 && strlen(chaine) < 5) {
         return 1;
     }
     return 0;
 }
 
 
-
-
-int contains(char * chaine,t_joueur joueur){
+int contains(char *chaine, t_joueur joueur) {
     t_carte main[joueur.nombreCartes];
-    recupererMain(joueur,main);
+    recupererMain(joueur, main);
 
 }
 
-void MONSIG(int num){
-
+void MONSIG(int num) {
     struct data_t *memoryShared;
     int retour_jouer_carte;
     char reponse[6];
-    int conforme=0;
+    int conforme = 0;
     key_t cleTas;
-    t_tas * tas;
-    cleTas=genererCleTas();
-    tas=recupererTasPartagee(cleTas);
+    t_tas *tas;
+    cleTas = genererCleTas();
+    tas = recupererTasPartagee(cleTas);
     t_carte derniereCarteTas;
-    derniereCarteTas=recupererDerniereCarteTas(tas);
-    switch(num){
+    derniereCarteTas = recupererDerniereCarteTas(tas);
+    printf("Vous avez l'id : %d\n",envoi->idClient);
+
+    switch (num) {
 
         case SIGUSR1:
             //sendSigusr1Server(pidServer);
             //printf("signal recu sigusr1 \n");
 
-            while(!conforme){
-                printf("Veuillez saisir la carte que vous souhaitez jouer \n");
-                scanf("%s",reponse);
+            while (!conforme) {
 
-                conforme=estConforme(reponse);
+                printf("Veuillez saisir la carte que vous souhaitez jouer \n");
+                scanf("%s", reponse);
+
+                conforme = estConforme(reponse);
                 //affichageDerniereCarteTas(tas);
             }
 

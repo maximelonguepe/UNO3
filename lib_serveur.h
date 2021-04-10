@@ -5,6 +5,7 @@ typedef struct {
     int expediteur;
 } t_message;
 
+void affichageJoueurJouant(t_partie *partie);
 void lancerPartie(t_partie *partie);
 
 void copie(t_carte *mains, t_carte *section, int taille);
