@@ -370,14 +370,17 @@ void MONSIG(int num) {
     printf("Vous avez l'id : %d\n", envoi->idClient);
     clePartie = genererClePartie();
     partie = recupererPartiePartagee(clePartie);
-
+    key_t cleMain;
+    cleMain=genererCleClient(partie->joueur[envoi->idClient]);
+    t_carte * main;
+    main=recupererMainPartagee(cleMain,partie->joueur[envoi->idClient]);
 
     switch (num) {
 
         case SIGUSR1:
 
-            printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
-            affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
+            //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
+            affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
             while ((existanceCarte==0)) {
                 if(erreurSaisie){
                     ROUGE;
