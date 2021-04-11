@@ -128,7 +128,6 @@ void ajouterCarteTas(t_tas *tas, t_carte carte) {
 
 key_t genererCle(char *chaine) {
     key_t cle2 = ftok(chaine, 'R');
-    printf("clee generee %d\n",cle2);
     return cle2;
 }
 
@@ -303,6 +302,10 @@ void sendSigusr1Server(t_partie *partie) {
     kill(partie->joueur[0].pid, SIGUSR1);
 }
 
+void sendSigusr2Server(t_partie *partie) {
+    kill(partie->joueur[0].pid, SIGUSR2);
+}
+
 void envoyerSignal1Joueur(t_joueur tJoueur) {
    // printf("envoie message \n");
     kill(tJoueur.pid, SIGUSR1);
@@ -397,6 +400,8 @@ void MONSIG(int num) {
             erreurSaisie=0;
             if(strcmp(reponse,"pioche")!=0){
                 sendSigusr1Server(partie);
+            } else{
+
             }
             break;
         case SIGUSR2:

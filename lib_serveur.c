@@ -121,28 +121,28 @@ void initTas(t_tas *tas) {
 
 
 void sendFifo2(t_joueur joueur, t_carte *carte) {
-   /* int i = joueur.id;
-    char str[3];
-    sprintf(str, "%d", i);
-    char myfifo[9];
-    strcpy(myfifo, "");
-    strcat(myfifo, str);
-    strcat(myfifo, ".fifo");
-    int entreeTube;
-    printf("creation fifo : %s\n", myfifo);
-    t_carte main[joueur.nombreCartes];
+    /* int i = joueur.id;
+     char str[3];
+     sprintf(str, "%d", i);
+     char myfifo[9];
+     strcpy(myfifo, "");
+     strcat(myfifo, str);
+     strcat(myfifo, ".fifo");
+     int entreeTube;
+     printf("creation fifo : %s\n", myfifo);
+     t_carte main[joueur.nombreCartes];
 
-    if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
-        printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
-        exit(EXIT_FAILURE);
-    }
-    copie(main, carte, joueur.nombreCartes);*/
-    t_carte * main;
+     if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
+         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
+         exit(EXIT_FAILURE);
+     }
+     copie(main, carte, joueur.nombreCartes);*/
+    t_carte *main;
     key_t cle;
-    cle=genererCleClient(joueur);
-    main=malloc(sizeof(t_carte)*joueur.nombreCartes);
-    main=recupererMainPartagee(cle,joueur);
-    copie(main,carte,joueur.nombreCartes);
+    cle = genererCleClient(joueur);
+    main = malloc(sizeof(t_carte) * joueur.nombreCartes);
+    main = recupererMainPartagee(cle, joueur);
+    copie(main, carte, joueur.nombreCartes);
     envoyerSignal1Joueur(joueur);
 
 
@@ -175,22 +175,18 @@ void envoyerSignal2TousJoueursSauf1(t_partie partie, t_joueur joueur) {
         }
     }
 }
-//TODO le passer en memoire partagee trop de pb
 
 void creerFichierTxt(t_joueur joueur) {
     char chaine[10];
-    genererNomFichier(joueur,chaine);
-    FILE* fichier = NULL;
+    genererNomFichier(joueur, chaine);
+    FILE *fichier = NULL;
     fichier = fopen(chaine, "w");
-    if (fichier != NULL)
-    {
+    if (fichier != NULL) {
 
         fclose(fichier); // On ferme le fichier qui a été ouvert
     }
 
 }
-
-
 
 
 void sendFifoCartes(t_partie *partie, t_carte *mains) {
