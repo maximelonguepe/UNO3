@@ -43,21 +43,21 @@ int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
     }
 }
 
-void * functionThreadPartieServer(void *pVoid){
+void *functionThreadPartieServer(void *pVoid) {
     sleep(1);
     key_t clePartie;
-    clePartie=genererClePartie();
-    t_partie * partie=recupererPartiePartagee(clePartie);
+    clePartie = genererClePartie();
+    t_partie *partie = recupererPartiePartagee(clePartie);
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
-    envoyerSignal2TousJoueursSauf1(*partie,partie->jouant);
-    newact.sa_handler=MONSIGServer;
+    envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
+    newact.sa_handler = MONSIGServer;
     sigemptyset(&newact.sa_mask);
-    sigaction(SIGUSR1,&newact,NULL);
-    sigaction(SIGALRM,&newact,NULL);
-    sigaction(SIGUSR2,&newact,NULL);
+    sigaction(SIGUSR1, &newact, NULL);
+    sigaction(SIGALRM, &newact, NULL);
+    sigaction(SIGUSR2, &newact, NULL);
 
-    while (1){
+    while (1) {
         sleep(20000);
     }
 
@@ -65,31 +65,29 @@ void * functionThreadPartieServer(void *pVoid){
 }
 
 
-
-
-void MONSIGServer(int num){
+void MONSIGServer(int num) {
 
     struct data_t *memoryShared;
     int retour_jouer_carte;
     key_t key;
-    key=genererClePartie();
+    key = genererClePartie();
     recupererPartiePartagee(key);
-    t_carte * cartesJoueurs;
+    t_carte *cartesJoueurs;
     t_partie *partie;
     key = genererClePartie();
-    partie=recupererPartiePartagee(key);
-   // sendFifoCartes(partie, );
+    partie = recupererPartiePartagee(key);
+    // sendFifoCartes(partie, );
 
-    switch(num){
+    switch (num) {
         case SIGUSR1:
 
-            partie=recupererPartiePartagee(key);
-           // printf("signal recu sigusr1 \n");
+            partie = recupererPartiePartagee(key);
+            // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
-            partie->jouant=partie->joueur[joueurSuivant(partie,partie->jouant,0)];
+            partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, 0)];
 
             envoyerSignal1Joueur(partie->jouant);
-            envoyerSignal2TousJoueursSauf1(*partie,partie->jouant);
+            envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
             break;
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
@@ -122,7 +120,7 @@ void initTas(t_tas *tas) {
 }
 
 
-void sendFifo2(t_joueur joueur, t_carte * carte) {
+void sendFifo2(t_joueur joueur, t_carte *carte) {
     int i = joueur.id;
     char str[3];
     sprintf(str, "%d", i);
@@ -138,53 +136,68 @@ void sendFifo2(t_joueur joueur, t_carte * carte) {
         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
         exit(EXIT_FAILURE);
     }
-    copie(main,carte,joueur.nombreCartes);
+    copie(main, carte, joueur.nombreCartes);
     envoyerSignal1Joueur(joueur);
-    write(entreeTube, carte, sizeof(t_carte)*joueur.nombreCartes);
+    write(entreeTube, carte, sizeof(t_carte) * joueur.nombreCartes);
 
 
 }
 
 
-
-int positionFinMainTableauMain(t_joueur joueur,int positionActuelle) {
-    return joueur.nombreCartes+positionActuelle;
+int positionFinMainTableauMain(t_joueur joueur, int positionActuelle) {
+    return joueur.nombreCartes + positionActuelle;
 }
 
-void selectionneMain(int debut, int fin, t_carte * mains,t_carte * destination){
-    t_carte tab[fin-debut];
-    int j=0;
+void selectionneMain(int debut, int fin, t_carte *mains, t_carte *destination) {
+    t_carte tab[fin - debut];
+    int j = 0;
     for (int i = debut; i < fin; ++i) {
         afficherCarte(mains[i]);
-        destination[j]=mains[i];
+        destination[j] = mains[i];
         j++;
     }
 
 }
 
-void envoyerSignal2Joueur(t_joueur joueur){
-    kill(joueur.pid,SIGUSR2);
+void envoyerSignal2Joueur(t_joueur joueur) {
+    kill(joueur.pid, SIGUSR2);
 }
 
-void envoyerSignal2TousJoueursSauf1(t_partie partie,t_joueur joueur){
-    for (int i = 1; i <=partie.nombreJoueurs ; ++i) {
-        if(partie.joueur[i].id!=joueur.id){
+void envoyerSignal2TousJoueursSauf1(t_partie partie, t_joueur joueur) {
+    for (int i = 1; i <= partie.nombreJoueurs; ++i) {
+        if (partie.joueur[i].id != joueur.id) {
             envoyerSignal2Joueur(partie.joueur[i]);
         }
     }
 }
 //TODO le passer en memoire partagee trop de pb
 
-void sendFifoCartes(t_partie *  partie, t_carte *mains) {
-    int positionActuelle=0;
-    int positionFinale=0;
+void creerFichierTxt(t_joueur joueur) {
+    char chaine[10];
+    genererNomFichier(joueur,chaine);
+    FILE* fichier = NULL;
+    fichier = fopen(chaine, "w");
+    if (fichier != NULL)
+    {
+
+        fclose(fichier); // On ferme le fichier qui a été ouvert
+    }
+
+}
+
+
+void sendFifoCartes(t_partie *partie, t_carte *mains) {
+    int positionActuelle = 0;
+    int positionFinale = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        printf("Joueur %d\n",i);
+        printf("Joueur %d\n", i);
         t_carte cartes[partie->joueur[i].nombreCartes];
-        positionActuelle=positionFinale;
-        positionFinale=positionFinMainTableauMain(partie->joueur[i],positionActuelle);
-        selectionneMain(positionActuelle,positionFinale,mains,cartes);
-        sendFifo2(partie->joueur[i],cartes);
+        positionActuelle = positionFinale;
+        positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
+        selectionneMain(positionActuelle, positionFinale, mains, cartes);
+        sendFifo2(partie->joueur[i], cartes);
+        creerFichierTxt(partie->joueur[i]);
+        genererCleClient(partie->joueur[i]);
     }
 }
 

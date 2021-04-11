@@ -128,8 +128,23 @@ void ajouterCarteTas(t_tas *tas, t_carte carte) {
 
 key_t genererCle(char *chaine) {
     key_t cle2 = ftok(chaine, 'R');
-    //printf("clee generee %d\n",cle2);
+    printf("clee generee %d\n",cle2);
     return cle2;
+}
+
+key_t genererCleClient(t_joueur joueur){
+    char chaine[10];
+    genererCle(genererNomFichier(joueur,chaine));
+}
+
+
+char * genererNomFichier(t_joueur joueur, char * chaine){
+    char str[3];
+    sprintf(str, "%d", joueur.id);
+    strcpy(chaine, "");
+    strcat(chaine, str);
+    strcat(chaine, ".txt");
+    return chaine;
 }
 
 key_t genererClePartie() {
@@ -348,6 +363,8 @@ void MONSIG(int num) {
     switch (num) {
 
         case SIGUSR1:
+
+            printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
             while ((existanceCarte==0)) {
                 if(erreurSaisie){

@@ -84,6 +84,12 @@ t_partie * recupererPartiePartagee(key_t key);
 
 void copie(t_carte * mains, t_carte * section,int taille);
 
+char * genererNomFichier(t_joueur joueur, char * chaine);
+
+key_t genererCleClient(t_joueur joueur);
+
+
+
 
 
 
