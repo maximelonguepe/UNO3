@@ -43,10 +43,10 @@ int estpossibilite(char *possiblitess) {
 }
 
 int existe(char *chaine) {
-    if(strcmp(chaine,"pioche")==0){
+    if (strcmp(chaine, "pioche") == 0) {
         return 1;
     }
-    if (strlen(chaine) <1 || strlen(chaine) >3)return 0;
+    if (strlen(chaine) < 1 || strlen(chaine) > 3)return 0;
     int couleurs = 0;
     char chainechouleur[5];
     char chainepossibilites[5];
@@ -131,13 +131,13 @@ key_t genererCle(char *chaine) {
     return cle2;
 }
 
-key_t genererCleClient(t_joueur joueur){
+key_t genererCleClient(t_joueur joueur) {
     char chaine[10];
-    genererCle(genererNomFichier(joueur,chaine));
+    genererCle(genererNomFichier(joueur, chaine));
 }
 
 
-char * genererNomFichier(t_joueur joueur, char * chaine){
+char *genererNomFichier(t_joueur joueur, char *chaine) {
     char str[3];
     sprintf(str, "%d", joueur.id);
     strcpy(chaine, "");
@@ -159,7 +159,7 @@ t_partie *recupererPartiePartagee(key_t key) {
     return partie;
 }
 
-t_carte *recupererMainPartagee(key_t key,t_joueur joueur) {
+t_carte *recupererMainPartagee(key_t key, t_joueur joueur) {
     int shmid;
     t_carte *carte;
     shmid = shmget(key, joueur.nombreCartes, 0644 | IPC_CREAT);
@@ -296,8 +296,6 @@ t_carte *recupererMain(t_joueur joueur, t_carte *mainJoueur) {
 }
 
 
-
-
 void sendSigusr1Server(t_partie *partie) {
     kill(partie->joueur[0].pid, SIGUSR1);
 }
@@ -307,7 +305,7 @@ void sendSigusr2Server(t_partie *partie) {
 }
 
 void envoyerSignal1Joueur(t_joueur tJoueur) {
-   // printf("envoie message \n");
+    // printf("envoie message \n");
     kill(tJoueur.pid, SIGUSR1);
     //printf("message envoyé\n");
 }
@@ -347,25 +345,41 @@ void refreshPartie(t_partie *partie) {
     partie = shmat(shmid, (void *) 0, 0);
 }
 
+void separerChaine(char *chaine, char *chaineCouleur, char *chainePossibilite) {
+    if ((strcmp(chaine, "jo") == 0) || strcmp(chaine, "+4")) {
+        strcpy(chainePossibilite, chaine);
+    } else {
+        chaineCouleur[0] = chaine[0];
+        chaineCouleur[1] = '\0';
+        chainePossibilite[0] = chaine[1];
+        if (strlen(chaine) == 2) {
+            chainePossibilite[1] = '\0';
+        } else {
+            chainePossibilite[1] = chaine[2];
+            chainePossibilite[2] = '\0';
+        }
+    }
+}
 
+int contains(char *chaine, t_joueur joueur, t_carte *main) {
+    char couleur[1];
+    char possibilite[3];
 
-int contains(char *chaine, t_joueur joueur) {
-    t_carte main[joueur.nombreCartes];
-    recupererMain(joueur, main);
 
 }
+
 
 void MONSIG(int num) {
 
     int retour_jouer_carte;
     char reponse[6];
     int conforme = 0;
-    int erreurSaisie=0;
+    int erreurSaisie = 0;
     key_t cleTas;
     key_t clePartie;
     t_tas *tas;
     t_partie *partie;
-    int existanceCarte=0;
+    int existanceCarte = 0;
     cleTas = genererCleTas();
     tas = recupererTasPartagee(cleTas);
     t_carte derniereCarteTas;
@@ -374,9 +388,9 @@ void MONSIG(int num) {
     clePartie = genererClePartie();
     partie = recupererPartiePartagee(clePartie);
     key_t cleMain;
-    cleMain=genererCleClient(partie->joueur[envoi->idClient]);
-    t_carte * main;
-    main=recupererMainPartagee(cleMain,partie->joueur[envoi->idClient]);
+    cleMain = genererCleClient(partie->joueur[envoi->idClient]);
+    t_carte *main;
+    main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
 
     switch (num) {
 
@@ -384,23 +398,23 @@ void MONSIG(int num) {
 
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
-            while ((existanceCarte==0)) {
-                if(erreurSaisie){
+            while ((existanceCarte == 0)) {
+                if (erreurSaisie) {
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
                     REINIT;
                 }
                 printf("Veuillez saisir la carte que vous souhaitez jouer \n");
                 scanf("%s", reponse);
-                existanceCarte=existe(reponse);
-                erreurSaisie=1;
+                existanceCarte = existe(reponse);
+                erreurSaisie = 1;
 
 
             }
-            erreurSaisie=0;
-            if(strcmp(reponse,"pioche")!=0){
+            erreurSaisie = 0;
+            if (strcmp(reponse, "pioche") != 0) {
                 sendSigusr1Server(partie);
-            } else{
+            } else {
 
             }
             break;
