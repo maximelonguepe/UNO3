@@ -88,6 +88,8 @@ char * genererNomFichier(t_joueur joueur, char * chaine);
 
 key_t genererCleClient(t_joueur joueur);
 
+t_carte *recupererMainPartagee(key_t key,t_joueur joueur);
+
 
 
 

@@ -147,6 +147,7 @@ char * genererNomFichier(t_joueur joueur, char * chaine){
     return chaine;
 }
 
+
 key_t genererClePartie() {
     return genererCle("partie.txt");
 }
@@ -158,6 +159,15 @@ t_partie *recupererPartiePartagee(key_t key) {
     partie = shmat(shmid, (void *) 0, 0);
     return partie;
 }
+
+t_carte *recupererMainPartagee(key_t key,t_joueur joueur) {
+    int shmid;
+    t_carte *carte;
+    shmid = shmget(key, joueur.nombreCartes, 0644 | IPC_CREAT);
+    carte = shmat(shmid, (void *) 0, 0);
+    return carte;
+}
+
 
 key_t genererCleTas() {
     return genererCle("tas.txt");
@@ -285,6 +295,8 @@ t_carte *recupererMain(t_joueur joueur, t_carte *mainJoueur) {
     //close(sortieTube);
     //return cartes;
 }
+
+
 
 
 void sendSigusr1Server(t_partie *partie) {

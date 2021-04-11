@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     t_joueur joueur;
     t_tas *tas;
     key_t cle;
-    t_carte mainDepart[MAINDEPART];
+    t_carte * mainDepart;
 
     key = genererClePartie();
 
@@ -82,8 +82,16 @@ int main(int argc, char *argv[]) {
     }
     cle2 = genererCleTas();
     tas = recupererTasPartagee(cle2);
-    recupererMain(partie->joueur[id], mainDepart);
-    affichageClient(partie, tas, mainDepart, id);
+    //recupererMain(partie->joueur[id], mainDepart);
+    key_t cleMain;
+    cleMain=genererCleClient(partie->joueur[id]);
+    n_sigusr1 = 0;
+    while (n_sigusr1 == 0) {
+
+        mainDepart = malloc(sizeof(t_carte) * partie->joueur[id].nombreCartes);
+        mainDepart = recupererMainPartagee(cleMain, partie->joueur[id]);
+        affichageClient(partie, tas, mainDepart, id);
+    }
     n_sigusr1 = 0;
     n_sigusr2 = 0;
     char reponse[5];

@@ -121,7 +121,7 @@ void initTas(t_tas *tas) {
 
 
 void sendFifo2(t_joueur joueur, t_carte *carte) {
-    int i = joueur.id;
+   /* int i = joueur.id;
     char str[3];
     sprintf(str, "%d", i);
     char myfifo[9];
@@ -136,9 +136,14 @@ void sendFifo2(t_joueur joueur, t_carte *carte) {
         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
         exit(EXIT_FAILURE);
     }
-    copie(main, carte, joueur.nombreCartes);
+    copie(main, carte, joueur.nombreCartes);*/
+    t_carte * main;
+    key_t cle;
+    cle=genererCleClient(joueur);
+    main=malloc(sizeof(t_carte)*joueur.nombreCartes);
+    main=recupererMainPartagee(cle,joueur);
+    copie(main,carte,joueur.nombreCartes);
     envoyerSignal1Joueur(joueur);
-    write(entreeTube, carte, sizeof(t_carte) * joueur.nombreCartes);
 
 
 }
@@ -184,6 +189,8 @@ void creerFichierTxt(t_joueur joueur) {
     }
 
 }
+
+
 
 
 void sendFifoCartes(t_partie *partie, t_carte *mains) {
