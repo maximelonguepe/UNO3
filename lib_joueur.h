@@ -79,7 +79,7 @@ key_t genererClePartie();
 void MONSIG(int num);
 
 void refreshPartie(t_partie *partie);
-
+t_carte recupererDerniereCarteTas(t_tas *tas) ;
 t_partie * recupererPartiePartagee(key_t key);
 
 void copie(t_carte * mains, t_carte * section,int taille);

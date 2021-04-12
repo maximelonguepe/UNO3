@@ -1,5 +1,6 @@
 #include "lib_serveur.h"
 t_carte * cartes;
+int tailleCarte;
 void distribuerNCartesJoueur(int idJoueur, int nombreCarte, t_pioche pioche) {
 
 }
@@ -27,8 +28,16 @@ int nombreDebut(t_partie *partie, t_joueur joueur) {
 
 }
 
-void affichageMain(t_partie *partie, t_carte *mains) {
+int numeroCarte(t_partie * partie,t_joueur joueur,t_carte carte){//ICI
 
+    int debut=nombreDebut(partie,joueur);
+    printf("Nombre debut  : %d\n",nombreDebut(partie,joueur));
+    int fin=positionFinMainTableauMain(joueur,debut);
+    for (int i = debut; i < fin; ++i) {
+        if(strcmp(cartes[i].numero_carte,carte.numero_carte)==0&&strcmp(cartes[i].couleur,carte.couleur)==0){
+            return i;
+        }
+    }
 }
 
 int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
@@ -48,6 +57,7 @@ void *functionThreadPartieServer(void *pVoid) {
     key_t clePartie;
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
+    tailleCarte=partie->nombreJoueurs*MAINDEPART* sizeof(t_carte);
     cartes= (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
     cartes=(t_carte * )pVoid;
     struct sigaction newact;
@@ -79,18 +89,21 @@ void MONSIGServer(int num) {
     key = genererClePartie();
     partie = recupererPartiePartagee(key);
     // sendFifoCartes(partie, );
-
+    t_tas * tas;
+    key_t cleTas=genererCleTas();
+    tas=recupererTasPartagee(cleTas);
     switch (num) {
         case SIGUSR1:
 
             partie = recupererPartiePartagee(key);
+            printf("Numero de la carte jouee : %d\n",numeroCarte(partie,partie->jouant,recupererDerniereCarteTas(tas)));
             // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, 0)];
 
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
-            affichageCarteMilieu(cartes[13]);
+
             break;
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
@@ -156,7 +169,7 @@ int positionFinMainTableauMain(t_joueur joueur, int positionActuelle) {
     return joueur.nombreCartes + positionActuelle;
 }
 
-void selectionneMain(int debut, int fin, t_carte *mains, t_carte *destination) {
+void selectionneMain(int debut, int fin, t_carte *mains, t_carte *destination) {//ICI2
     t_carte tab[fin - debut];
     int j = 0;
     for (int i = debut; i < fin; ++i) {
