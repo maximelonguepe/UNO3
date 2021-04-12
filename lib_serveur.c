@@ -1,8 +1,18 @@
 #include "lib_serveur.h"
-t_carte * cartes;
+
+t_carte *cartes;
 int tailleCarte;
+
 void distribuerNCartesJoueur(int idJoueur, int nombreCarte, t_pioche pioche) {
 
+}
+
+int tailleMainPartagee(t_partie *partie) {
+    int nbCartes = 0;
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        nbCartes += partie->joueur[i].nombreCartes;
+    }
+    return nbCartes;
 }
 
 void distributionMainDepart(t_pioche *pioche, t_carte *carteJoueurs, t_partie *partie) {
@@ -28,13 +38,13 @@ int nombreDebut(t_partie *partie, t_joueur joueur) {
 
 }
 
-int numeroCarte(t_partie * partie,t_joueur joueur,t_carte carte){//ICI
+int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {//ICI
 
-    int debut=nombreDebut(partie,joueur);
-    printf("Nombre debut  : %d\n",nombreDebut(partie,joueur));
-    int fin=positionFinMainTableauMain(joueur,debut);
+    int debut = nombreDebut(partie, joueur);
+    printf("Nombre debut  : %d\n", nombreDebut(partie, joueur));
+    int fin = positionFinMainTableauMain(joueur, debut);
     for (int i = debut; i < fin; ++i) {
-        if(strcmp(cartes[i].numero_carte,carte.numero_carte)==0&&strcmp(cartes[i].couleur,carte.couleur)==0){
+        if (strcmp(cartes[i].numero_carte, carte.numero_carte) == 0 && strcmp(cartes[i].couleur, carte.couleur) == 0) {
             return i;
         }
     }
@@ -57,9 +67,9 @@ void *functionThreadPartieServer(void *pVoid) {
     key_t clePartie;
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
-    tailleCarte=partie->nombreJoueurs*MAINDEPART* sizeof(t_carte);
-    cartes= (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
-    cartes=(t_carte * )pVoid;
+    tailleCarte = partie->nombreJoueurs * MAINDEPART * sizeof(t_carte);
+    cartes = (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
+    cartes = (t_carte *) pVoid;
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
     envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
@@ -89,14 +99,16 @@ void MONSIGServer(int num) {
     key = genererClePartie();
     partie = recupererPartiePartagee(key);
     // sendFifoCartes(partie, );
-    t_tas * tas;
-    key_t cleTas=genererCleTas();
-    tas=recupererTasPartagee(cleTas);
+    t_tas *tas;
+    key_t cleTas = genererCleTas();
+    tas = recupererTasPartagee(cleTas);
     switch (num) {
         case SIGUSR1:
 
             partie = recupererPartiePartagee(key);
-            printf("Numero de la carte jouee : %d\n",numeroCarte(partie,partie->jouant,recupererDerniereCarteTas(tas)));
+            printf("Numero de la carte jouee : %d\n",
+                   numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas)));
+            printf("Nombre de cartes total %d\n",tailleMainPartagee(partie));
             // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, 0)];
