@@ -368,7 +368,7 @@ int contains(char *chaine, t_joueur joueur, t_carte *main) {
     char chainePossibilite[3];
     char couleur[1];
     char possibilite[3];
-t_carte carte;
+    t_carte carte;
     separerChaine(chaine, chaineCouleur, chainePossibilite);
     for (int i = 0; i < joueur.nombreCartes; ++i) {
         carte = main[i];
@@ -386,23 +386,16 @@ t_carte carte;
 
 }
 
-t_carte containTest(char *chaine, t_joueur joueur, t_carte *main){
+t_carte containTest(char *chaine, t_joueur joueur, t_carte *main) {
+    printf("Recherche carte \n");
     char chaineCouleur[3];
-    char chainePossibilite[3];
+    char chainePossibilite[4];
     char couleur[1];
     char possibilite[3];
-    t_carte *  carte;
     separerChaine(chaine, chaineCouleur, chainePossibilite);
     for (int i = 0; i < joueur.nombreCartes; ++i) {
-        *carte = main[i];
-        if (strcmp(chaineCouleur, "") == 0) {
-            if (strcmp(chainePossibilite, "jo") == 0 || strcmp(chainePossibilite, "+4") == 0) {
-                return main[i];
-            }
-        } else {
-            if (strcmp(carte->numero_carte, chainePossibilite) == 0 && strcmp(carte->couleur, chaineCouleur) == 0) {
-                return main[i];
-            }
+        if (strcmp(main[i].numero_carte, chainePossibilite) == 0 && strcmp(main[i].couleur, chaineCouleur) == 0) {
+            return main[i];
         }
     }
     //return 0;
