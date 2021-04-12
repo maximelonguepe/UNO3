@@ -1,5 +1,5 @@
 #include "lib_serveur.h"
-
+// TODO : gerer le cas ou la premiere carte est un joker
 t_carte *cartes;
 int tailleCarte;
 int inverse = 0;

@@ -390,8 +390,7 @@ t_carte containTest(char *chaine, t_joueur joueur, t_carte *main) {
     printf("Recherche carte \n");
     char chaineCouleur[3];
     char chainePossibilite[4];
-    char couleur[1];
-    char possibilite[3];
+
     separerChaine(chaine, chaineCouleur, chainePossibilite);
     for (int i = 0; i < joueur.nombreCartes; ++i) {
         if (strcmp(main[i].numero_carte, chainePossibilite) == 0 && strcmp(main[i].couleur, chaineCouleur) == 0) {
@@ -399,6 +398,24 @@ t_carte containTest(char *chaine, t_joueur joueur, t_carte *main) {
         }
     }
     //return 0;
+}
+
+
+int estJouable(t_tas *tas, char * chaine) {
+    char chaineCouleur[3];
+    char chainePossibilite[4];
+
+    separerChaine(chaine, chaineCouleur, chainePossibilite);
+    if (strcmp(chaineCouleur, "") == 0) {
+        if (strcmp(chainePossibilite, "jo") == 0 || strcmp(chainePossibilite, "+4") == 0) {
+            return 1;
+        } else return 0;
+    } else {
+        if (strcmp(recupererDerniereCarteTas(tas).numero_carte, chainePossibilite) == 0 ||
+            strcmp(recupererDerniereCarteTas(tas).couleur, chaineCouleur) == 0) {
+            return 1;
+        } else return 0;
+    }
 }
 
 
@@ -415,6 +432,8 @@ void MONSIG(int num) {
     int existanceCarte = 0;
     int cartePresente = 0;
     int carteNonPresente = 0;
+    int jouable=0;
+    int nonJouable=0;
     cleTas = genererCleTas();
     tas = recupererTasPartagee(cleTas);
     t_carte derniereCarteTas;
@@ -434,7 +453,7 @@ void MONSIG(int num) {
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
-            while ((existanceCarte == 0) || cartePresente == 0) {
+            while ((existanceCarte == 0) || cartePresente == 0 || jouable==0) {
                 if (erreurSaisie) {
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
@@ -445,12 +464,20 @@ void MONSIG(int num) {
                     printf("Vous n'avez pas cette carte dans votre main \n");
                     REINIT;
                 }
+                if (nonJouable) {
+                    ROUGE;
+                    printf("Vous n'avez pas le droit de jouer cette carte \n");
+                    REINIT;
+                }
                 printf("Veuillez saisir la carte que vous souhaitez jouer \n");
                 scanf("%s", reponse);
                 existanceCarte = existe(reponse);
                 if (!existanceCarte) erreurSaisie = 1;
                 cartePresente = contains(reponse, partie->joueur[envoi->idClient], main);
                 if (!cartePresente)carteNonPresente = 1;
+                jouable=estJouable(tas,reponse);
+                if(!jouable)nonJouable=1;
+
             }
             erreurSaisie = 0;
             carteNonPresente = 0;
