@@ -1,6 +1,6 @@
 #include "lib_serveur.h"
 
-#define NBJOUEUR 2
+#define NBJOUEUR 3
 
 int id = 0;
 

@@ -2,6 +2,7 @@
 
 t_carte *cartes;
 int tailleCarte;
+int inverse = 0;
 
 void distribuerNCartesJoueur(int idJoueur, int nombreCarte, t_pioche pioche) {
 
@@ -56,8 +57,8 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
         cartes[i] = cartes[i + 1];
     }
     joueur->nombreCartes--;
-    tailleCarte=tailleMainPartagee(partie);
-    cartes=realloc(cartes,tailleCarte* sizeof(t_carte));
+    tailleCarte = tailleMainPartagee(partie);
+    cartes = realloc(cartes, tailleCarte * sizeof(t_carte));
 
 }
 
@@ -124,7 +125,20 @@ void MONSIGServer(int num) {
             printf("Nombre de cartes total %d\n", tailleMainPartagee(partie));
             // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
-            partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, 0)];
+            if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "in") == 0) {
+                switch (inverse) {
+                    case 0:
+                        inverse = 1;
+                        break;
+                    case 1:
+                        inverse = 0;
+                        break;
+
+                }
+            }
+
+
+            partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
             sendFifoCartes2(partie, cartes);
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
@@ -212,7 +226,6 @@ void sendFifo3(t_joueur joueur, t_carte *carte) {
     main = malloc(sizeof(t_carte) * joueur.nombreCartes);
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
-
 
 
 }
