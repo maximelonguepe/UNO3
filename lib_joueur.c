@@ -432,6 +432,7 @@ void MONSIG(int num) {
         case SIGUSR1:
 
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
+            main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
             while ((existanceCarte == 0) || cartePresente == 0) {
                 if (erreurSaisie) {
@@ -462,6 +463,7 @@ void MONSIG(int num) {
             }
             break;
         case SIGUSR2:
+            main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
             affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
             break;
 

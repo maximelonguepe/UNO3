@@ -41,6 +41,6 @@ void MONSIGServer(int num);
 void *functionThreadPartieServer(void *pVoid);
 
 void envoyerSignal2TousJoueursSauf1(t_partie partie,t_joueur joueur);
-
+void sendFifoCartes2(t_partie *partie, t_carte *mains);
 
 

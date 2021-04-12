@@ -38,7 +38,8 @@ int nombreDebut(t_partie *partie, t_joueur joueur) {
 
 }
 
-int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {//ICI
+int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {
+
 
     int debut = nombreDebut(partie, joueur);
     printf("Nombre debut  : %d\n", nombreDebut(partie, joueur));
@@ -49,6 +50,17 @@ int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {//ICI
         }
     }
 }
+
+void decalage(t_partie *partie, int debut, t_joueur *joueur) {
+    for (int i = debut; i < tailleMainPartagee(partie); ++i) {
+        cartes[i] = cartes[i + 1];
+    }
+    joueur->nombreCartes--;
+    tailleCarte=tailleMainPartagee(partie);
+    cartes=realloc(cartes,tailleCarte* sizeof(t_carte));
+
+}
+
 
 int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
     switch (inverse) {
@@ -106,13 +118,14 @@ void MONSIGServer(int num) {
         case SIGUSR1:
 
             partie = recupererPartiePartagee(key);
-            printf("Numero de la carte jouee : %d\n",
-                   numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas)));
-            printf("Nombre de cartes total %d\n",tailleMainPartagee(partie));
+
+            int num = numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas));
+            decalage(partie, num, &partie->joueur[partie->jouant.id]);
+            printf("Nombre de cartes total %d\n", tailleMainPartagee(partie));
             // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, 0)];
-
+            sendFifoCartes2(partie, cartes);
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
 
@@ -176,6 +189,33 @@ void sendFifo2(t_joueur joueur, t_carte *carte) {
 
 }
 
+void sendFifo3(t_joueur joueur, t_carte *carte) {
+    /* int i = joueur.id;
+     char str[3];
+     sprintf(str, "%d", i);
+     char myfifo[9];
+     strcpy(myfifo, "");
+     strcat(myfifo, str);
+     strcat(myfifo, ".fifo");
+     int entreeTube;
+     printf("creation fifo : %s\n", myfifo);
+     t_carte main[joueur.nombreCartes];
+
+     if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
+         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
+         exit(EXIT_FAILURE);
+     }
+     copie(main, carte, joueur.nombreCartes);*/
+    t_carte *main;
+    key_t cle;
+    cle = genererCleClient(joueur);
+    main = malloc(sizeof(t_carte) * joueur.nombreCartes);
+    main = recupererMainPartagee(cle, joueur);
+    copie(main, carte, joueur.nombreCartes);
+
+
+
+}
 
 int positionFinMainTableauMain(t_joueur joueur, int positionActuelle) {
     return joueur.nombreCartes + positionActuelle;
@@ -231,5 +271,21 @@ void sendFifoCartes(t_partie *partie, t_carte *mains) {
         genererCleClient(partie->joueur[i]);
     }
 }
+
+void sendFifoCartes2(t_partie *partie, t_carte *mains) {
+    int positionActuelle = 0;
+    int positionFinale = 0;
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        printf("Joueur %d\n", i);
+        t_carte cartes[partie->joueur[i].nombreCartes];
+        positionActuelle = positionFinale;
+        positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
+        selectionneMain(positionActuelle, positionFinale, mains, cartes);
+        sendFifo3(partie->joueur[i], cartes);
+        creerFichierTxt(partie->joueur[i]);
+        genererCleClient(partie->joueur[i]);
+    }
+}
+
 
 
