@@ -1,4 +1,5 @@
 #include "lib_serveur.h"
+
 // TODO : gerer le cas ou la premiere carte est un joker
 t_carte *cartes;
 int tailleCarte;
@@ -139,6 +140,9 @@ void MONSIGServer(int num) {
 
 
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
+            if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "pa") == 0) {
+                partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
+            }
             sendFifoCartes2(partie, cartes);
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
