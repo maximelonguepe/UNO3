@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     partie->jouant = partie->joueur[1];
     int inverse = 0;
     pthread_t threadPartie;
-    pthread_create(&threadPartie, NULL, functionThreadPartieServer,NULL );
+    pthread_create(&threadPartie, NULL, functionThreadPartieServer,cartesJoueurs);
     n_sigusr1 = 0;
     sleep(10);
     void *ret;

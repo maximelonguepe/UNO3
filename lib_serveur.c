@@ -1,5 +1,5 @@
 #include "lib_serveur.h"
-
+t_carte * cartes;
 void distribuerNCartesJoueur(int idJoueur, int nombreCarte, t_pioche pioche) {
 
 }
@@ -48,6 +48,8 @@ void *functionThreadPartieServer(void *pVoid) {
     key_t clePartie;
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
+    cartes= (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
+    cartes=(t_carte * )pVoid;
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
     envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
@@ -88,6 +90,7 @@ void MONSIGServer(int num) {
 
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
+            affichageCarteMilieu(cartes[13]);
             break;
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
