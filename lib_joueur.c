@@ -346,8 +346,10 @@ void refreshPartie(t_partie *partie) {
 }
 
 void separerChaine(char *chaine, char *chaineCouleur, char *chainePossibilite) {
-    if ((strcmp(chaine, "jo") == 0) || strcmp(chaine, "+4")) {
+    if ((strcmp(chaine, "jo") == 0) || strcmp(chaine, "+4") == 0) {
+        printf("est carte sans couleur \n");
         strcpy(chainePossibilite, chaine);
+        strcpy(chaineCouleur, "");
     } else {
         chaineCouleur[0] = chaine[0];
         chaineCouleur[1] = '\0';
@@ -362,9 +364,25 @@ void separerChaine(char *chaine, char *chaineCouleur, char *chainePossibilite) {
 }
 
 int contains(char *chaine, t_joueur joueur, t_carte *main) {
+    char chaineCouleur[3];
+    char chainePossibilite[3];
     char couleur[1];
     char possibilite[3];
-
+    t_carte carte;
+    separerChaine(chaine, chaineCouleur, chainePossibilite);
+    for (int i = 0; i < joueur.nombreCartes; ++i) {
+        carte = main[i];
+        if (strcmp(chaineCouleur, "") == 0) {
+            if (strcmp(chainePossibilite, "jo") == 0 || strcmp(chainePossibilite, "+4") == 0) {
+                return 1;
+            } else return 0;
+        } else {
+            if (strcmp(carte.numero_carte, chainePossibilite) == 0 && strcmp(carte.couleur, chaineCouleur) == 0) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 
 }
 
@@ -380,6 +398,8 @@ void MONSIG(int num) {
     t_tas *tas;
     t_partie *partie;
     int existanceCarte = 0;
+    int cartePresente=0;
+    int carteNonPresente=0;
     cleTas = genererCleTas();
     tas = recupererTasPartagee(cleTas);
     t_carte derniereCarteTas;
@@ -398,20 +418,28 @@ void MONSIG(int num) {
 
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
-            while ((existanceCarte == 0)) {
+            while ((existanceCarte == 0)||cartePresente==0) {
                 if (erreurSaisie) {
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
                     REINIT;
                 }
+                if (carteNonPresente) {
+                    ROUGE;
+                    printf("Vous n'avez pas cette carte dans votre main \n");
+                    REINIT;
+                }
                 printf("Veuillez saisir la carte que vous souhaitez jouer \n");
                 scanf("%s", reponse);
                 existanceCarte = existe(reponse);
-                erreurSaisie = 1;
+                if(!existanceCarte) erreurSaisie = 1;
+                cartePresente=contains(reponse, partie->joueur[envoi->idClient], main);
+                if(!cartePresente)carteNonPresente=1;
 
 
             }
             erreurSaisie = 0;
+            carteNonPresente=0;
             if (strcmp(reponse, "pioche") != 0) {
                 sendSigusr1Server(partie);
             } else {
