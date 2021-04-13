@@ -6,24 +6,47 @@ couleur coul[NBCOULEURS] = {"r", "b", "j", "v"};
 numero possi[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "2", "3", "4", "5", "6", "7",
                                 "8", "9"};
 
+/**
+ * Affichage du joueur en train de jouer
+ * @param partie
+ */
 void affichageJoueurJouant(t_partie *partie) {
     printf("Joueur en train de jouer : %s\n", partie->joueur[partie->jouant.id].nom);
 }
 
+/**
+ * Affiche le nom du joueur
+ * @param joueur
+ */
 void affichageJoueur(t_joueur joueur) {
     printf("%s\n", joueur.nom);
 }
 
+/**
+ * affecte a un joueur un nom
+ * @param joueur
+ * @param nom
+ */
 void affectationNom(t_joueur *joueur, char *nom) {
     strcpy(joueur->nom, nom);
 }
 
+/**
+ * liste les joueurs connectés a la partie
+ * @param joueur
+ * @param nbJoueurs
+ */
 void listageJoueurs(t_joueur *joueur, int nbJoueurs) {
     for (int i = 1; i <= nbJoueurs; ++i) {
         affichageJoueur(joueur[i]);
     }
 }
 
+/**
+ * si la chaine est une couleur retourne 1 sinon retourne 0
+ * @param couleur
+ * @return
+ */
 int estCouleur(char *couleur) {
     for (int i = 0; i < NBCOULEURS; ++i) {
         if (strcmp(couleur, coul[i]) == 0) {
@@ -33,6 +56,11 @@ int estCouleur(char *couleur) {
     return 0;
 }
 
+/**
+ * si la chaine est une possibilité (carte normale ou joker etc...)
+ * @param possiblitess
+ * @return
+ */
 int estpossibilite(char *possiblitess) {
     for (int i = 0; i < NBPOSSIBILITES; ++i) {
         if (strcmp(possiblitess, possi[i]) == 0) {
@@ -42,6 +70,14 @@ int estpossibilite(char *possiblitess) {
     return 0;
 }
 
+/**
+ * si la chaine correspond à une carte : par exemple j7 retourne 1
+ * sinon si la chaine ne correspond pas par exmple : a8 retourne 0
+ * cas spéciaux : les jokers : +4 ,jo retourne 1
+ * cependant si on saisit la carte rjo celle si va retourner 0
+ * @param chaine
+ * @return
+ */
 int existe(char *chaine) {
     if (strcmp(chaine, "pioche") == 0) {
         return 1;
@@ -76,7 +112,11 @@ int existe(char *chaine) {
 
 }
 
-
+/**
+ * si un des joueurs a sa main vide alors la partie se termine
+ * @param partie
+ * @return
+ */
 int partieTerminee(t_partie *partie) {
 
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
@@ -85,6 +125,10 @@ int partieTerminee(t_partie *partie) {
     return 0;
 }
 
+/**
+ * affichage coté client de la liste des joueurs : leur nom et leur nombre de cartes
+ * @param partie
+ */
 void affichageJoueursClient(t_partie *partie) {
     char str[3];
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
@@ -95,30 +139,50 @@ void affichageJoueursClient(t_partie *partie) {
     }
 }
 
+/**
+ * affichage d'une carte au milieu
+ * sert pour afficher la derniere carte du tas
+ * @param carte
+ */
 void affichageCarteMilieu(t_carte carte) {
     affichageCouleur(carte.couleur);
     char couleur[25];
     char numero[25];
     strcpy(couleur, "- ");
     strcat(couleur, carte.couleur);
-    strcat(couleur, " -");
+    if (strlen(carte.numero_carte) == 1)strcat(couleur, " -");
+    else {
+        if (strcmp(carte.couleur, "") != 0) strcat(couleur, "  -");
+        else strcat(couleur, "   -");
+    }
     strcpy(numero, "- ");
     strcat(numero, carte.numero_carte);
     strcat(numero, " -");
 
-    print_milieu("-----");
+    if (strlen(carte.numero_carte) == 1) print_milieu("-----");
+    else print_milieu("------");
     print_milieu(couleur);
     print_milieu(numero);
-
-    print_milieu("-----");
+    if (strlen(carte.numero_carte) == 1) print_milieu("-----");
+    else print_milieu("------");
     REINIT;
 }
 
+/**
+ * augmenter la taille du tas
+ * principalement utilisé quand un joueur joue une carte
+ * @param tas
+ */
 
 void augmenterTailleTas(t_tas *tas) {
     tas->taille++;
 }
 
+/**
+ * ajoute une carte au tas
+ * @param tas
+ * @param carte
+ */
 void ajouterCarteTas(t_tas *tas, t_carte carte) {
     //tas->cartes = realloc(tas->cartes, tas->taille + 1 * sizeof(t_carte));
     tas->cartes[tas->taille] = carte;
@@ -126,17 +190,32 @@ void ajouterCarteTas(t_tas *tas, t_carte carte) {
 
 }
 
+/**
+ * genere avec une chaine relative a un nom de fichier une clé
+ * @param chaine
+ * @return
+ */
 key_t genererCle(char *chaine) {
     key_t cle2 = ftok(chaine, 'R');
     return cle2;
 }
 
+/**
+ * renvoie la clé relative a chaque client
+ * @param joueur
+ * @return
+ */
 key_t genererCleClient(t_joueur joueur) {
     char chaine[10];
     genererCle(genererNomFichier(joueur, chaine));
 }
 
-
+/**
+ * genere une chaine de caractere relative a l'id du client
+ * @param joueur
+ * @param chaine
+ * @return
+ */
 char *genererNomFichier(t_joueur joueur, char *chaine) {
     char str[3];
     sprintf(str, "%d", joueur.id);
@@ -146,11 +225,19 @@ char *genererNomFichier(t_joueur joueur, char *chaine) {
     return chaine;
 }
 
-
+/**
+ * genere une cle de partie
+ * @return
+ */
 key_t genererClePartie() {
     return genererCle("partie.txt");
 }
 
+/**
+ * recupère une partie en passant la clé de la partie en parametre
+ * @param key
+ * @return
+ */
 t_partie *recupererPartiePartagee(key_t key) {
     int shmid;
     t_partie *partie;
@@ -159,6 +246,12 @@ t_partie *recupererPartiePartagee(key_t key) {
     return partie;
 }
 
+/**
+ *  recupère la main en passant la clé de la main en parametre
+ * @param key
+ * @param joueur
+ * @return
+ */
 t_carte *recupererMainPartagee(key_t key, t_joueur joueur) {
     int shmid;
     t_carte *carte;
@@ -167,11 +260,20 @@ t_carte *recupererMainPartagee(key_t key, t_joueur joueur) {
     return carte;
 }
 
+/**
+ * genere une cle relative au tas dans la memoire partagee
+ * @return
+ */
 
 key_t genererCleTas() {
     return genererCle("tas.txt");
 }
 
+/**
+ * recupere le tas dans la memoire partagee
+ * @param cle2
+ * @return
+ */
 t_tas *recupererTasPartagee(key_t cle2) {
     t_tas *tas;
     int media2 = shmget(cle2, sizeof(t_tas), 0777 | IPC_CREAT);
@@ -179,15 +281,28 @@ t_tas *recupererTasPartagee(key_t cle2) {
     return tas;
 }
 
+/**
+ * recupere la derniere carte du tas
+ * @param tas
+ * @return
+ */
 t_carte recupererDerniereCarteTas(t_tas *tas) {
     return tas->cartes[tas->taille - 1];
 }
 
-
+/**
+ * affiche la derniere carte du tas au milieu de lecra du joueur
+ * @param tas
+ */
 void affichageDerniereCarteTas(t_tas *tas) {
     affichageCarteMilieu(tas->cartes[tas->taille - 1]);
 }
 
+/**
+ * affiche le haut des cartes ( le ----)
+ * @param cartes
+ * @param nombreCartes
+ */
 void affichageHautCartes(t_carte *cartes, int nombreCartes) {
     char chaine[10000];
     strcpy(chaine, "");
@@ -195,23 +310,45 @@ void affichageHautCartes(t_carte *cartes, int nombreCartes) {
 
         //strcat(chaine,"-----\t");
         affichageCouleur(cartes[i].couleur);
-        printf("-----\t");
+        if (strlen(cartes[i].numero_carte) == 1) {
+            printf("-----\t");
+
+        } else {
+            printf("------\t");
+        }
         REINIT;
     }
     printf("\n");
 }
 
+/**
+ * affiche les couleurs sur la meme ligne
+ * @param cartes
+ * @param nombreCartes
+ */
 void affichageCouleurMain(t_carte *cartes, int nombreCartes) {
     for (int i = 0; i < nombreCartes; ++i) {
         affichageCouleur(cartes[i].couleur);
         printf("- ");
         printf("%s", cartes[i].couleur);
-        printf(" -\t");
+        if (strlen(cartes[i].numero_carte) == 1) {
+            printf(" -\t");
+        } else {
+            if (strcmp(cartes[i].couleur, "") != 0) printf("  -\t");
+            else printf("   -\t");
+
+
+        }
         REINIT;
     }
     printf("\n");
 }
 
+/**
+ * affiche le numero de la carte
+ * @param cartes
+ * @param nombreCartes
+ */
 void affichageNumeroMain(t_carte *cartes, int nombreCartes) {
     for (int i = 0; i < nombreCartes; ++i) {
         affichageCouleur(cartes[i].couleur);
@@ -401,7 +538,7 @@ t_carte containTest(char *chaine, t_joueur joueur, t_carte *main) {
 }
 
 
-int estJouable(t_tas *tas, char * chaine) {
+int estJouable(t_tas *tas, char *chaine) {
     char chaineCouleur[3];
     char chainePossibilite[4];
 
@@ -432,8 +569,8 @@ void MONSIG(int num) {
     int existanceCarte = 0;
     int cartePresente = 0;
     int carteNonPresente = 0;
-    int jouable=0;
-    int nonJouable=0;
+    int jouable = 0;
+    int nonJouable = 0;
     cleTas = genererCleTas();
     tas = recupererTasPartagee(cleTas);
     t_carte derniereCarteTas;
@@ -453,7 +590,7 @@ void MONSIG(int num) {
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
-            while ((existanceCarte == 0) || cartePresente == 0 || jouable==0) {
+            while ((existanceCarte == 0) || cartePresente == 0 || jouable == 0) {
                 if (erreurSaisie) {
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
@@ -475,8 +612,8 @@ void MONSIG(int num) {
                 if (!existanceCarte) erreurSaisie = 1;
                 cartePresente = contains(reponse, partie->joueur[envoi->idClient], main);
                 if (!cartePresente)carteNonPresente = 1;
-                jouable=estJouable(tas,reponse);
-                if(!jouable)nonJouable=1;
+                jouable = estJouable(tas, reponse);
+                if (!jouable)nonJouable = 1;
 
             }
             erreurSaisie = 0;
