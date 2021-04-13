@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     n_sigusr1 = 0;
     n_sigusr2 = 0;
     char reponse[5];
-    pidServer=partie->joueur[0].pid;
+    //pidServer=partie->joueur[0].pid;
     n_sigusr1 = 0;
     envoi->main=malloc(sizeof(t_carte)*partie->joueur[id].nombreCartes);
     copie(envoi->main,mainDepart,partie->joueur[id].nombreCartes);

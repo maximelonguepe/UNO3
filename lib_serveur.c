@@ -47,8 +47,14 @@ int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {
     printf("Nombre debut  : %d\n", nombreDebut(partie, joueur));
     int fin = positionFinMainTableauMain(joueur, debut);
     for (int i = debut; i < fin; ++i) {
-        if (strcmp(cartes[i].numero_carte, carte.numero_carte) == 0 && strcmp(cartes[i].couleur, carte.couleur) == 0) {
-            return i;
+
+        if (strcmp(cartes[i].numero_carte, carte.numero_carte) == 0 ) {
+            if (strcmp(cartes[i].couleur, carte.couleur) == 0){
+                return i;
+            }
+            else if (strcmp(carte.numero_carte,"jo")==0||(strcmp(carte.numero_carte,"+4")==0)){
+                return i;
+            }
         }
     }
 }
@@ -121,8 +127,8 @@ void MONSIGServer(int num) {
 
             partie = recupererPartiePartagee(key);
 
-            int num = numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas));
-            decalage(partie, num, &partie->joueur[partie->jouant.id]);
+            int numero = numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas));
+            decalage(partie, numero, &partie->joueur[partie->jouant.id]);
             printf("Nombre de cartes total %d\n", tailleMainPartagee(partie));
             // printf("signal recu sigusr1 \n");
             //on change de joueur jouant

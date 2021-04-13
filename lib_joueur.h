@@ -5,7 +5,7 @@
 #define TAILLE_SHM 1024
 #define MAXCARTES 20
 
-int pidServer;
+//int pidServer;
 typedef struct {
     int id;
     int pid;

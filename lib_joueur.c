@@ -619,9 +619,13 @@ void MONSIG(int num) {
             erreurSaisie = 0;
             carteNonPresente = 0;
             if (strcmp(reponse, "pioche") != 0) {
+                ajouterCarteTas(tas, containTest(reponse, partie->joueur[envoi->idClient], main));
+                if (strcmp(reponse,"jo")==0||(strcmp(reponse,"+4")==0)){
+                    strcpy(tas->cartes[tas->taille-1].couleur,"r");
+                }
                 sendSigusr1Server(partie);
 
-                ajouterCarteTas(tas, containTest(reponse, partie->joueur[envoi->idClient], main));
+
             } else {
 
             }
