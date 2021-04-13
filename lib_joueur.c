@@ -491,7 +491,7 @@ void MONSIG(int num) {
             break;
         case SIGUSR2:
             main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
-            affichageClientPartieCommencee(partie, tas, envoi->main, envoi->idClient);
+            affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
             break;
 
         case SIGALRM:

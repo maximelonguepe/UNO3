@@ -81,7 +81,7 @@ void *functionThreadPartieServer(void *pVoid) {
     key_t clePartie;
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
-    tailleCarte = partie->nombreJoueurs * MAINDEPART * sizeof(t_carte);
+    tailleCarte = partie->nombreJoueurs * MAINDEPART;
     cartes = (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
     cartes = (t_carte *) pVoid;
     struct sigaction newact;
