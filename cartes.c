@@ -4,24 +4,6 @@
  * definition des fonctions
  */
 
-/*
- * liste les differentes couleurs possible
- */
-void listeCouleurs(couleur *couleurs) {
-    for (int i = 0; i < 4; ++i) {
-        printf("%s\n", couleurs[i]);
-    }
-}
-
-/*
- *  * liste les differentes possibilites / numeros possible
-
- */
-void listePossibilites(numero *possibilites) {
-    for (int i = 0; i < 15; ++i) {
-        printf("%s\n", possibilites[i]);
-    }
-}
 
 /*
  * permet d'affecter une couleur a une carte peut etre utile si on change par la suite le type de la couleur
