@@ -69,6 +69,11 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
 
 }
 
+void decalagePioche(t_partie * partie){
+    int debut=nombreDebut(partie,partie->joueur[partie->jouant.id]);
+    int fin=debut+partie->joueur[partie->jouant.id].nombreCartes;
+    printf("Plage : %d , %d \n",debut,fin);
+}
 
 int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
     switch (inverse) {
@@ -156,6 +161,7 @@ void MONSIGServer(int num) {
             break;
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
+            decalagePioche(partie);
             break;
 
         case SIGALRM:
@@ -214,29 +220,12 @@ void sendFifo2(t_joueur joueur, t_carte *carte) {
 }
 
 void sendFifo3(t_joueur joueur, t_carte *carte) {
-    /* int i = joueur.id;
-     char str[3];
-     sprintf(str, "%d", i);
-     char myfifo[9];
-     strcpy(myfifo, "");
-     strcat(myfifo, str);
-     strcat(myfifo, ".fifo");
-     int entreeTube;
-     printf("creation fifo : %s\n", myfifo);
-     t_carte main[joueur.nombreCartes];
-
-     if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
-         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
-         exit(EXIT_FAILURE);
-     }
-     copie(main, carte, joueur.nombreCartes);*/
     t_carte *main;
     key_t cle;
     cle = genererCleClient(joueur);
     main = malloc(sizeof(t_carte) * joueur.nombreCartes);
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
-
 
 }
 

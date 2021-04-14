@@ -501,6 +501,9 @@ void separerChaine(char *chaine, char *chaineCouleur, char *chainePossibilite) {
 }
 
 int contains(char *chaine, t_joueur joueur, t_carte *main) {
+    if (strcmp(chaine, "pioche") == 0) {
+        return 1;
+    }
     char chaineCouleur[3];
     char chainePossibilite[3];
     char couleur[1];
@@ -540,7 +543,9 @@ t_carte containTest(char *chaine, t_joueur joueur, t_carte *main) {
 int estJouable(t_tas *tas, char *chaine) {
     char chaineCouleur[3];
     char chainePossibilite[4];
-
+    if (strcmp(chaine, "pioche") == 0) {
+        return 1;
+    }
     separerChaine(chaine, chaineCouleur, chainePossibilite);
     if (strcmp(chaineCouleur, "") == 0) {
         if (strcmp(chainePossibilite, "jo") == 0 || strcmp(chainePossibilite, "+4") == 0) {
@@ -589,7 +594,7 @@ void MONSIG(int num) {
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
-            while ((existanceCarte == 0) || cartePresente == 0 || jouable == 0) {
+            while ((existanceCarte == 0 || cartePresente == 0 || jouable == 0 )) {
                 if (erreurSaisie) {
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
@@ -614,6 +619,7 @@ void MONSIG(int num) {
                 jouable = estJouable(tas, reponse);
                 if (!jouable)nonJouable = 1;
 
+
             }
             erreurSaisie = 0;
             carteNonPresente = 0;
@@ -635,7 +641,7 @@ void MONSIG(int num) {
 
 
             } else {
-
+            sendSigusr2Server(partie);
             }
             break;
         case SIGUSR2:
