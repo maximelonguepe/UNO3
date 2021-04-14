@@ -12,7 +12,7 @@ int id = 0;
 couleur couleurs[NBCOULEURS] = {"r", "b", "j", "v"};
 numero possibilites[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "2", "3", "4", "5", "6", "7",
                                        "8", "9"};
-t_pioche pioche;
+
 t_carte *cartesJoueurs;
 volatile sig_atomic_t n_sigusr1 = 0;
 volatile sig_atomic_t n_sigusr2 = 0;

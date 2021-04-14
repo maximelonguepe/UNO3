@@ -1,9 +1,6 @@
 #include "lib_joueur.h"
 
-typedef struct {
-    char nom[MAXPSEUDO];
-    int expediteur;
-} t_message;
+t_pioche pioche;
 
 void affichageJoueurJouant(t_partie *partie);
 
