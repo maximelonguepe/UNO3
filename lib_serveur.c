@@ -100,7 +100,7 @@ void *functionThreadPartieServer(void *pVoid) {
     sigaction(SIGUSR2, &newact, NULL);
 
     while (1) {
-        sleep(20000);
+        sleep(2);
     }
 
     pthread_exit(0);

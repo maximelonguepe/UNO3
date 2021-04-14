@@ -467,7 +467,7 @@ void *functionThreadPartie(void *pVoid) {
     //printf("INFO : Attente des informations du serveur ;\n");
 
     while (1) {
-        sleep(20000);
+        sleep(2);
     }
 
     pthread_exit(0);
@@ -484,7 +484,7 @@ void refreshPartie(t_partie *partie) {
 
 void separerChaine(char *chaine, char *chaineCouleur, char *chainePossibilite) {
     if ((strcmp(chaine, "jo") == 0) || strcmp(chaine, "+4") == 0) {
-        printf("est carte sans couleur \n");
+
         strcpy(chainePossibilite, chaine);
         strcpy(chaineCouleur, "");
     } else {
@@ -524,7 +524,6 @@ int contains(char *chaine, t_joueur joueur, t_carte *main) {
 }
 
 t_carte containTest(char *chaine, t_joueur joueur, t_carte *main) {
-    printf("Recherche carte \n");
     char chaineCouleur[3];
     char chainePossibilite[4];
 
@@ -620,8 +619,17 @@ void MONSIG(int num) {
             carteNonPresente = 0;
             if (strcmp(reponse, "pioche") != 0) {
                 ajouterCarteTas(tas, containTest(reponse, partie->joueur[envoi->idClient], main));
-                if (strcmp(reponse,"jo")==0||(strcmp(reponse,"+4")==0)){
-                    strcpy(tas->cartes[tas->taille-1].couleur,"r");
+                if (strcmp(reponse, "jo") == 0 || (strcmp(reponse, "+4") == 0)) {
+                    char reponse2[5];
+                    int isCouleur = 0;
+                    int nestPasCouleur = 0;
+                    while (isCouleur == 0) {
+                        printf("Quelle couleur voulez vous imposer : \n");
+                        scanf("%s", reponse2);
+                        if (isCouleur=estCouleur(reponse2)) strcpy(tas->cartes[tas->taille - 1].couleur, reponse2);
+
+                    }
+
                 }
                 sendSigusr1Server(partie);
 
