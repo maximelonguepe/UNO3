@@ -72,6 +72,7 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
 void decalagePioche(t_partie * partie){
     int debut=nombreDebut(partie,partie->joueur[partie->jouant.id]);
     int fin=debut+partie->joueur[partie->jouant.id].nombreCartes;
+
     printf("Plage : %d , %d \n",debut,fin);
 }
 
@@ -162,6 +163,9 @@ void MONSIGServer(int num) {
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
             decalagePioche(partie);
+            sendFifoCartes2(partie, cartes);
+            envoyerSignal1Joueur(partie->jouant);
+            envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
             break;
 
         case SIGALRM:
