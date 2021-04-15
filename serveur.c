@@ -1,6 +1,6 @@
 #include "lib_serveur.h"
 
-#define NBJOUEUR 3
+#define NBJOUEUR 1
 
 int id = 0;
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     melangerPioche(&pioche);
     //afficherPioche(pioche);
 
-    cartesJoueurs = (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
+    cartesJoueurs = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART)+10, sizeof(t_carte));
     distributionMainDepart(&pioche, cartesJoueurs, partie);
     printf("Il y a %d cartes dans la main globale\n", partie->nombreJoueurs * MAINDEPART);
     printf("Il y a %d cartes dans la main du joueur\n", partie->joueur[2].nombreCartes);

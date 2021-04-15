@@ -94,7 +94,7 @@ void *functionThreadPartieServer(void *pVoid) {
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
     tailleCarte = partie->nombreJoueurs * MAINDEPART;
-    cartes = (t_carte *) calloc(partie->nombreJoueurs * MAINDEPART, sizeof(t_carte));
+    cartes = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART)+10, sizeof(t_carte));
     cartes = (t_carte *) pVoid;
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
@@ -204,7 +204,6 @@ void sendFifo2(t_joueur joueur, t_carte *carte) {
     t_carte *main;
     key_t cle;
     cle = genererCleClient(joueur);
-    main = malloc(sizeof(t_carte) * joueur.nombreCartes);
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
     envoyerSignal1Joueur(joueur);
