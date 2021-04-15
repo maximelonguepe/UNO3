@@ -17,12 +17,17 @@ int tailleMainPartagee(t_partie *partie) {
     return nbCartes;
 }
 
+t_carte recupererDerniereCartePioche(t_pioche *pioche) {
+    t_carte carte = pioche->pioche[pioche->nombreCarteRestante];
+    pioche->nombreCarteRestante--;
+    return carte;
+}
+
 void distributionMainDepart(t_pioche *pioche, t_carte *carteJoueurs, t_partie *partie) {
     int j = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
         for (int k = 0; k < MAINDEPART; ++k) {
-            carteJoueurs[j] = pioche->pioche[pioche->nombreCarteRestante];
-            pioche->nombreCarteRestante--;
+            carteJoueurs[j] = recupererDerniereCartePioche(pioche);
             j++;
         }
         partie->joueur[i].nombreCartes = MAINDEPART;
@@ -68,12 +73,13 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
 
 void decalagePioche(t_partie *partie) {
     partie->joueur[partie->jouant.id].nombreCartes++;
-    cartes = realloc(cartes, tailleMainPartagee(partie) * sizeof(t_carte));
+    cartes = (t_carte * )realloc(cartes, (tailleMainPartagee(partie)) * sizeof(t_carte));
     int debut = nombreDebut(partie, partie->joueur[partie->jouant.id]);
     int fin = debut + partie->joueur[partie->jouant.id].nombreCartes;
     for (int i = tailleMainPartagee(partie); i >= fin; --i) {
-    cartes[i]=cartes[i-1];
+        cartes[i] = cartes[i - 1];
     }
+    cartes[fin-1]=recupererDerniereCartePioche(&pioche);
 
 }
 
@@ -135,7 +141,6 @@ void MONSIGServer(int num) {
 
             int numero = numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas));
             decalage(partie, numero, &partie->joueur[partie->jouant.id]);
-            printf("Nombre de cartes total %d\n", tailleMainPartagee(partie));
             // printf("signal recu sigusr1 \n");
             //on change de joueur jouant
             if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "in") == 0) {
@@ -154,7 +159,16 @@ void MONSIGServer(int num) {
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
             if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "pa") == 0) {
                 partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
+            } else if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "+2") == 0){
+                decalagePioche(partie);
+                decalagePioche(partie);
+            }else if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "+4") == 0){
+                decalagePioche(partie);
+                decalagePioche(partie);
+                decalagePioche(partie);
+                decalagePioche(partie);
             }
+
             sendFifoCartes2(partie, cartes);
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
@@ -200,7 +214,6 @@ void initTas(t_tas *tas) {
 
 void sendFifo2(t_joueur joueur, t_carte *carte) {
     ROUGE;
-    printf("Nombre de cartes %d", joueur.nombreCartes);
     REINIT;
     t_carte *main;
     key_t cle;
@@ -216,7 +229,7 @@ void sendFifo3(t_joueur joueur, t_carte *carte) {
     t_carte *main;
     key_t cle;
     cle = genererCleClient(joueur);
-    main = malloc(sizeof(t_carte) * joueur.nombreCartes);
+    main = calloc(joueur.nombreCartes, sizeof(t_carte));
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
 
