@@ -3,7 +3,7 @@
 #define MAXPSEUDO 7
 #define MAXJOUEURS 10
 #define TAILLE_SHM 1024
-#define MAXCARTES 20
+#define MAXCARTES 30
 
 //int pidServer;
 typedef struct {

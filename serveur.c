@@ -1,6 +1,6 @@
 #include "lib_serveur.h"
 
-#define NBJOUEUR 1
+#define NBJOUEUR 3
 
 int id = 0;
 
@@ -13,7 +13,7 @@ couleur couleurs[NBCOULEURS] = {"r", "b", "j", "v"};
 numero possibilites[NBPOSSIBILITES] = {"+2", "+4", "pa", "jo", "in", "0", "1", "2", "3", "4", "5", "6", "7",
                                        "8", "9"};
 
-t_carte *cartesJoueurs;
+t_carte * cartesJoueurs;
 volatile sig_atomic_t n_sigusr1 = 0;
 volatile sig_atomic_t n_sigusr2 = 0;
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     melangerPioche(&pioche);
     //afficherPioche(pioche);
 
-    cartesJoueurs = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART)+10, sizeof(t_carte));
+    cartesJoueurs = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART*10), sizeof(t_carte));
     distributionMainDepart(&pioche, cartesJoueurs, partie);
     printf("Il y a %d cartes dans la main globale\n", partie->nombreJoueurs * MAINDEPART);
     printf("Il y a %d cartes dans la main du joueur\n", partie->joueur[2].nombreCartes);

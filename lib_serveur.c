@@ -65,7 +65,7 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
     }
     joueur->nombreCartes--;
     tailleCarte = tailleMainPartagee(partie);
-    cartes = realloc(cartes, tailleCarte * sizeof(t_carte));
+    //cartes = realloc(cartes, tailleCarte * sizeof(t_carte));
 
 }
 
@@ -94,7 +94,7 @@ void *functionThreadPartieServer(void *pVoid) {
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
     tailleCarte = partie->nombreJoueurs * MAINDEPART;
-    cartes = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART)+10, sizeof(t_carte));
+    cartes = (t_carte *) calloc((partie->nombreJoueurs *MAINDEPART), sizeof(t_carte));
     cartes = (t_carte *) pVoid;
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
@@ -120,7 +120,6 @@ void MONSIGServer(int num) {
     key_t key;
     key = genererClePartie();
     recupererPartiePartagee(key);
-    t_carte *cartesJoueurs;
     t_partie *partie;
     key = genererClePartie();
     partie = recupererPartiePartagee(key);
@@ -162,8 +161,10 @@ void MONSIGServer(int num) {
             break;
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
-            decalagePioche(partie);
             partie->joueur[partie->jouant.id].nombreCartes++;
+            cartes=realloc(cartes,tailleMainPartagee(partie)* sizeof(t_carte)+5);
+            decalagePioche(partie);
+
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
             sendFifoCartes2(partie, cartes);
             envoyerSignal1Joueur(partie->jouant);

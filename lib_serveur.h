@@ -1,5 +1,5 @@
 #include "lib_joueur.h"
-
+#define NBJOUEUR 3
 t_pioche pioche;
 
 void affichageJoueurJouant(t_partie *partie);
