@@ -303,9 +303,9 @@ void sendFifoCartes2(t_partie *partie, t_carte *mains) {
         positionActuelle = positionFinale;
         positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
         selectionneMain(positionActuelle, positionFinale, mains, cartes);
-        sendFifo3(partie->joueur[i], cartes);
         creerFichierTxt(partie->joueur[i]);
-        genererCleClient(partie->joueur[i]);
+        sendFifo3(partie->joueur[i], cartes);
+
     }
 }
 
