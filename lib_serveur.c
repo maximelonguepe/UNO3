@@ -163,6 +163,8 @@ void MONSIGServer(int num) {
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
             decalagePioche(partie);
+            partie->joueur[partie->jouant.id].nombreCartes++;
+            partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
             sendFifoCartes2(partie, cartes);
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
@@ -196,22 +198,9 @@ void initTas(t_tas *tas) {
 
 
 void sendFifo2(t_joueur joueur, t_carte *carte) {
-    /* int i = joueur.id;
-     char str[3];
-     sprintf(str, "%d", i);
-     char myfifo[9];
-     strcpy(myfifo, "");
-     strcat(myfifo, str);
-     strcat(myfifo, ".fifo");
-     int entreeTube;
-     printf("creation fifo : %s\n", myfifo);
-     t_carte main[joueur.nombreCartes];
-
-     if ((entreeTube = open(myfifo, O_WRONLY)) == -1) {
-         printf("CLIENT - Impossible d'ouvrir l'entree du FIFO \n");
-         exit(EXIT_FAILURE);
-     }
-     copie(main, carte, joueur.nombreCartes);*/
+    ROUGE;
+    printf("Nombre de cartes %d",joueur.nombreCartes);
+    REINIT;
     t_carte *main;
     key_t cle;
     cle = genererCleClient(joueur);
@@ -292,7 +281,7 @@ void sendFifoCartes2(t_partie *partie, t_carte *mains) {
     int positionActuelle = 0;
     int positionFinale = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        printf("Joueur %d\n", i);
+        printf("Joueur %d nombres de cartes %d\n", i,partie->joueur[i].nombreCartes);
         t_carte cartes[partie->joueur[i].nombreCartes];
         positionActuelle = positionFinale;
         positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
@@ -303,5 +292,19 @@ void sendFifoCartes2(t_partie *partie, t_carte *mains) {
     }
 }
 
+void sendFifoCartes3(t_partie *partie, t_carte *mains) {
+    int positionActuelle = 0;
+    int positionFinale = 0;
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        printf("Joueur %d nombres de cartes %d\n", i,partie->joueur[i].nombreCartes);
+        t_carte cartes[partie->joueur[i].nombreCartes];
+        positionActuelle = positionFinale;
+        positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
+        selectionneMain(positionActuelle, positionFinale, mains, cartes);
+        creerFichierTxt(partie->joueur[i]);
+        sendFifo3(partie->joueur[i], cartes);
+        genererCleClient(partie->joueur[i]);
+    }
+}
 
 
