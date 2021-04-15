@@ -48,11 +48,10 @@ int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {
     int fin = positionFinMainTableauMain(joueur, debut);
     for (int i = debut; i < fin; ++i) {
 
-        if (strcmp(cartes[i].numero_carte, carte.numero_carte) == 0 ) {
-            if (strcmp(cartes[i].couleur, carte.couleur) == 0){
+        if (strcmp(cartes[i].numero_carte, carte.numero_carte) == 0) {
+            if (strcmp(cartes[i].couleur, carte.couleur) == 0) {
                 return i;
-            }
-            else if (strcmp(carte.numero_carte,"jo")==0||(strcmp(carte.numero_carte,"+4")==0)){
+            } else if (strcmp(carte.numero_carte, "jo") == 0 || (strcmp(carte.numero_carte, "+4") == 0)) {
                 return i;
             }
         }
@@ -65,15 +64,17 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
     }
     joueur->nombreCartes--;
     tailleCarte = tailleMainPartagee(partie);
-    //cartes = realloc(cartes, tailleCarte * sizeof(t_carte));
-
 }
 
-void decalagePioche(t_partie * partie){
-    int debut=nombreDebut(partie,partie->joueur[partie->jouant.id]);
-    int fin=debut+partie->joueur[partie->jouant.id].nombreCartes;
+void decalagePioche(t_partie *partie) {
+    partie->joueur[partie->jouant.id].nombreCartes++;
+    cartes = realloc(cartes, tailleMainPartagee(partie) * sizeof(t_carte));
+    int debut = nombreDebut(partie, partie->joueur[partie->jouant.id]);
+    int fin = debut + partie->joueur[partie->jouant.id].nombreCartes;
+    for (int i = tailleMainPartagee(partie); i >= fin; --i) {
+    cartes[i]=cartes[i-1];
+    }
 
-    printf("Plage : %d , %d \n",debut,fin);
 }
 
 int joueurSuivant(t_partie *partie, t_joueur joueur, int inverse) {
@@ -94,7 +95,7 @@ void *functionThreadPartieServer(void *pVoid) {
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
     tailleCarte = partie->nombreJoueurs * MAINDEPART;
-    cartes = (t_carte *) calloc((partie->nombreJoueurs *MAINDEPART), sizeof(t_carte));
+    cartes = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART), sizeof(t_carte));
     cartes = (t_carte *) pVoid;
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
@@ -161,8 +162,7 @@ void MONSIGServer(int num) {
             break;
         case SIGUSR2:
             //printf("sig recu sigusr2\n");
-            partie->joueur[partie->jouant.id].nombreCartes++;
-            cartes=realloc(cartes,tailleMainPartagee(partie)* sizeof(t_carte)+5);
+
             decalagePioche(partie);
 
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
@@ -200,7 +200,7 @@ void initTas(t_tas *tas) {
 
 void sendFifo2(t_joueur joueur, t_carte *carte) {
     ROUGE;
-    printf("Nombre de cartes %d",joueur.nombreCartes);
+    printf("Nombre de cartes %d", joueur.nombreCartes);
     REINIT;
     t_carte *main;
     key_t cle;
@@ -281,7 +281,7 @@ void sendFifoCartes2(t_partie *partie, t_carte *mains) {
     int positionActuelle = 0;
     int positionFinale = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        printf("Joueur %d nombres de cartes %d\n", i,partie->joueur[i].nombreCartes);
+        printf("Joueur %d nombres de cartes %d\n", i, partie->joueur[i].nombreCartes);
         t_carte cartes[partie->joueur[i].nombreCartes];
         positionActuelle = positionFinale;
         positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
@@ -296,7 +296,7 @@ void sendFifoCartes3(t_partie *partie, t_carte *mains) {
     int positionActuelle = 0;
     int positionFinale = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        printf("Joueur %d nombres de cartes %d\n", i,partie->joueur[i].nombreCartes);
+        printf("Joueur %d nombres de cartes %d\n", i, partie->joueur[i].nombreCartes);
         t_carte cartes[partie->joueur[i].nombreCartes];
         positionActuelle = positionFinale;
         positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
