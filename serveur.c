@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
     media = shmget(cle, sizeof(carte1), 0644 | IPC_CREAT);
     carte1 = shmat(media, (void *) 0, 0);
     partie->joueur[0].pid = getpid();
+    partie->partieTerminee=0;
     strcpy(partie->joueur[0].nom, "serveur");
 
     //tas = malloc(sizeof(t_tas));
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
     melangerPioche(&pioche);
     //afficherPioche(pioche);
 
-    cartesJoueurs = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART*10), sizeof(t_carte));
+    cartesJoueurs = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART), sizeof(t_carte));
     distributionMainDepart(&pioche, cartesJoueurs, partie);
     printf("Il y a %d cartes dans la main globale\n", partie->nombreJoueurs * MAINDEPART);
     printf("Il y a %d cartes dans la main du joueur\n", partie->joueur[2].nombreCartes);
@@ -99,7 +100,7 @@ int main(int argc, char *argv[]) {
     sleep(10);
     void *ret;
     pthread_join(threadPartie, &ret);
-
+    print_milieu("Partie terminee\n");
 }
 
 static void sig_handler(int signum) {

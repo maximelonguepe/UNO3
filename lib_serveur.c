@@ -73,7 +73,11 @@ void decalage(t_partie *partie, int debut, t_joueur *joueur) {
 
 void decalagePioche(t_partie *partie) {
     partie->joueur[partie->jouant.id].nombreCartes++;
-    cartes = (t_carte * )realloc(cartes, (tailleMainPartagee(partie)) * sizeof(t_carte));
+    printf("taille carte--->%ld\n", sizeof(t_carte));
+    printf("taille main globale--->%ld\n",tailleMainPartagee(partie)* sizeof(t_carte));
+    cartes = (t_carte * )realloc(cartes, (tailleMainPartagee(partie)+1) * sizeof(t_carte));
+    printf("Taille apres realloc %ld\n", sizeof(cartes));
+
     int debut = nombreDebut(partie, partie->joueur[partie->jouant.id]);
     int fin = debut + partie->joueur[partie->jouant.id].nombreCartes;
     for (int i = tailleMainPartagee(partie); i >= fin; --i) {
@@ -100,8 +104,8 @@ void *functionThreadPartieServer(void *pVoid) {
     key_t clePartie;
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
-    tailleCarte = partie->nombreJoueurs * MAINDEPART;
-    cartes = (t_carte *) calloc((partie->nombreJoueurs * MAINDEPART), sizeof(t_carte));
+    //tailleCarte = partie->nombreJoueurs * MAINDEPART;
+    cartes = (t_carte *) calloc((partie->nombreJoueurs), sizeof(t_carte));
     cartes = (t_carte *) pVoid;
     struct sigaction newact;
     envoyerSignal1Joueur(partie->jouant);
@@ -112,7 +116,7 @@ void *functionThreadPartieServer(void *pVoid) {
     sigaction(SIGALRM, &newact, NULL);
     sigaction(SIGUSR2, &newact, NULL);
 
-    while (1) {
+    while (!partieTerminee(partie)) {
         sleep(2);
     }
 
@@ -229,7 +233,7 @@ void sendFifo3(t_joueur joueur, t_carte *carte) {
     t_carte *main;
     key_t cle;
     cle = genererCleClient(joueur);
-    main = calloc(joueur.nombreCartes, sizeof(t_carte));
+    main = calloc(joueur.nombreCartes*30, sizeof(t_carte));
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
 

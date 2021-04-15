@@ -104,6 +104,7 @@ int main(int argc, char *argv[]) {
 
     void *ret;
     pthread_join(threadPartie, &ret);
+    print_milieu("fin de partie");
     return 0;
 
 }

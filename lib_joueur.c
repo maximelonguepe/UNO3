@@ -458,7 +458,9 @@ void *functionThreadPartie(void *pVoid) {
     envoi = (t_envoi *) pVoid;
 
     struct sigaction newact;
-
+    key_t clePartie;
+    clePartie = genererClePartie();
+    t_partie *partie = recupererPartiePartagee(clePartie);
     newact.sa_handler = MONSIG;
     sigemptyset(&newact.sa_mask);
     sigaction(SIGUSR1, &newact, NULL);
@@ -466,7 +468,7 @@ void *functionThreadPartie(void *pVoid) {
     sigaction(SIGUSR2, &newact, NULL);
     //printf("INFO : Attente des informations du serveur ;\n");
 
-    while (1) {
+    while (!partieTerminee(partie)) {
         sleep(2);
     }
 
