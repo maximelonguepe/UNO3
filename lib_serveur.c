@@ -197,6 +197,7 @@ void MONSIGServer(int num) {
                     decalagePioche(partie);
                     decalagePioche(partie);
                     decalagePioche(partie);
+                    partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
                 }
 
                 sendFifoCartes(partie, cartes, 0);

@@ -646,7 +646,7 @@ void MONSIG(int num) {
                     printf("Vous n'avez pas le droit de jouer cette carte \n");
                     REINIT;
                 }
-                printf("Veuillez saisir la carte que vous souhaitez jouer \n");
+                printf("Veuillez saisir la carte que vous souhaitez jouer (exemple r7, jo, +4, v+2)\n");
                 scanf("%s", reponse);
                 existanceCarte = existe(reponse);
                 if (!existanceCarte) erreurSaisie = 1;
