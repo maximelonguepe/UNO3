@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     envoyerSignal1Joueurs(partie);
     //afficherCarte(tas->cartes[0]);
     //sendFifoAllPlayers(partie);
-    sendFifoCartes(partie, cartesJoueurs);
+    sendFifoCartes(partie, cartesJoueurs,1);
     printf("---- taille pioche : %d\n", pioche.nombreCarteRestante);
     partie->jouant = partie->joueur[1];
     int inverse = 0;

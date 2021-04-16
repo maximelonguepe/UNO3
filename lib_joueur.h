@@ -24,7 +24,7 @@ typedef struct {
 
 typedef struct {
     int idClient;
-    t_carte * main;
+    t_carte *main;
 
 } t_envoi;
 
@@ -33,13 +33,23 @@ typedef struct {
     t_carte cartes[108];
     int taille;
 } t_tas;
+typedef struct {
+    char message[10000];
+} t_message;
 
 key_t genererCleTas();
 
+key_t genererCleMessage();
+
+int estCarteSpeciale(t_carte carte);
 
 void affichageJoueur(t_joueur joueur);
 
+int estPlus2(t_carte carte);
+
 void affectationNom(t_joueur *joueur, char *nom);
+
+int estPlus4(t_carte carte);
 
 void listageJoueurs(t_joueur *joueur, int nbJoueurs);
 
@@ -71,7 +81,7 @@ int partieTerminee(t_partie *partie);
 
 void affichageClient(t_partie *partie, t_tas *tas, t_carte *mainDepart, int id);
 
-void sendSigusr1Server(t_partie * partie);
+void sendSigusr1Server(t_partie *partie);
 
 void *functionThreadPartie(void *pVoid);
 
@@ -80,17 +90,20 @@ key_t genererClePartie();
 void MONSIG(int num);
 
 void refreshPartie(t_partie *partie);
-t_carte recupererDerniereCarteTas(t_tas *tas) ;
-t_partie * recupererPartiePartagee(key_t key);
 
-void copie(t_carte * mains, t_carte * section,int taille);
+t_carte recupererDerniereCarteTas(t_tas *tas);
 
-char * genererNomFichier(t_joueur joueur, char * chaine);
+t_partie *recupererPartiePartagee(key_t key);
+
+void copie(t_carte *mains, t_carte *section, int taille);
+
+char *genererNomFichier(t_joueur joueur, char *chaine);
 
 key_t genererCleClient(t_joueur joueur);
 
-t_carte *recupererMainPartagee(key_t key,t_joueur joueur);
+t_carte *recupererMainPartagee(key_t key, t_joueur joueur);
 
+int estPasse(t_carte carte);
 
 
 

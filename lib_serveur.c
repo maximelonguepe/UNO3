@@ -5,10 +5,11 @@ t_carte *cartes;
 int tailleCarte;
 int inverse = 0;
 
-void distribuerNCartesJoueur(int idJoueur, int nombreCarte, t_pioche pioche) {
-
-}
-
+/**
+ * retourne la taille de la main globale des joueurs
+ * @param partie
+ * @return
+ */
 int tailleMainPartagee(t_partie *partie) {
     int nbCartes = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
@@ -17,12 +18,23 @@ int tailleMainPartagee(t_partie *partie) {
     return nbCartes;
 }
 
+/**
+ * recupere la derniere carte de la pioche et decremente la pioche
+ * @param pioche
+ * @return
+ */
 t_carte recupererDerniereCartePioche(t_pioche *pioche) {
     t_carte carte = pioche->pioche[pioche->nombreCarteRestante];
     pioche->nombreCarteRestante--;
     return carte;
 }
 
+/**
+ * Distribue la main de départ dans la main globale
+ * @param pioche
+ * @param carteJoueurs
+ * @param partie
+ */
 void distributionMainDepart(t_pioche *pioche, t_carte *carteJoueurs, t_partie *partie) {
     int j = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
@@ -35,6 +47,12 @@ void distributionMainDepart(t_pioche *pioche, t_carte *carteJoueurs, t_partie *p
 
 }
 
+/**
+ * reto
+ * @param partie
+ * @param joueur
+ * @return
+ */
 int nombreDebut(t_partie *partie, t_joueur joueur) {
     int nombre = 0;
     for (int i = 1; i < joueur.id; ++i) {
@@ -45,45 +63,58 @@ int nombreDebut(t_partie *partie, t_joueur joueur) {
 
 }
 
+/**
+ * retourne l'index de la carte demandée dans l'ensemble de cartes de tous les joueurs
+ * @param partie
+ * @param joueur
+ * @param carte
+ * @return
+ */
 int numeroCarte(t_partie *partie, t_joueur joueur, t_carte carte) {
 
 
     int debut = nombreDebut(partie, joueur);
-    printf("Nombre debut  : %d\n", nombreDebut(partie, joueur));
     int fin = positionFinMainTableauMain(joueur, debut);
     for (int i = debut; i < fin; ++i) {
 
         if (strcmp(cartes[i].numero_carte, carte.numero_carte) == 0) {
             if (strcmp(cartes[i].couleur, carte.couleur) == 0) {
                 return i;
-            } else if (strcmp(carte.numero_carte, "jo") == 0 || (strcmp(carte.numero_carte, "+4") == 0)) {
+            } else if (estCarteSpeciale(carte)) {
                 return i;
             }
         }
     }
 }
 
+/**
+ * permet de decaler la main vers la gauche lorsqu'on veut ajouter une carte au tas
+ * @param partie
+ * @param debut
+ * @param joueur
+ */
 void decalage(t_partie *partie, int debut, t_joueur *joueur) {
     for (int i = debut; i < tailleMainPartagee(partie); ++i) {
         cartes[i] = cartes[i + 1];
     }
     joueur->nombreCartes--;
     tailleCarte = tailleMainPartagee(partie);
+    cartes = realloc(cartes, tailleCarte * sizeof(t_carte));
 }
 
+/**
+ * 
+ * @param partie
+ */
 void decalagePioche(t_partie *partie) {
     partie->joueur[partie->jouant.id].nombreCartes++;
-    printf("taille carte--->%ld\n", sizeof(t_carte));
-    printf("taille main globale--->%ld\n",tailleMainPartagee(partie)* sizeof(t_carte));
-    cartes = (t_carte * )realloc(cartes, (tailleMainPartagee(partie)+1) * sizeof(t_carte));
-    printf("Taille apres realloc %ld\n", sizeof(cartes));
-
+    cartes = (t_carte *) realloc(cartes, (tailleMainPartagee(partie) + 1) * sizeof(t_carte));
     int debut = nombreDebut(partie, partie->joueur[partie->jouant.id]);
     int fin = debut + partie->joueur[partie->jouant.id].nombreCartes;
     for (int i = tailleMainPartagee(partie); i >= fin; --i) {
         cartes[i] = cartes[i - 1];
     }
-    cartes[fin-1]=recupererDerniereCartePioche(&pioche);
+    cartes[fin - 1] = recupererDerniereCartePioche(&pioche);
 
 }
 
@@ -104,7 +135,6 @@ void *functionThreadPartieServer(void *pVoid) {
     key_t clePartie;
     clePartie = genererClePartie();
     t_partie *partie = recupererPartiePartagee(clePartie);
-    //tailleCarte = partie->nombreJoueurs * MAINDEPART;
     cartes = (t_carte *) calloc((partie->nombreJoueurs), sizeof(t_carte));
     cartes = (t_carte *) pVoid;
     struct sigaction newact;
@@ -134,7 +164,6 @@ void MONSIGServer(int num) {
     t_partie *partie;
     key = genererClePartie();
     partie = recupererPartiePartagee(key);
-    // sendFifoCartes(partie, );
     t_tas *tas;
     key_t cleTas = genererCleTas();
     tas = recupererTasPartagee(cleTas);
@@ -145,8 +174,6 @@ void MONSIGServer(int num) {
 
             int numero = numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas));
             decalage(partie, numero, &partie->joueur[partie->jouant.id]);
-            // printf("signal recu sigusr1 \n");
-            //on change de joueur jouant
             if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "in") == 0) {
                 switch (inverse) {
                     case 0:
@@ -158,33 +185,31 @@ void MONSIGServer(int num) {
 
                 }
             }
-
-
-            partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
-            if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "pa") == 0) {
+            if (!partieTerminee(partie)) {
                 partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
-            } else if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "+2") == 0){
-                decalagePioche(partie);
-                decalagePioche(partie);
-            }else if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "+4") == 0){
-                decalagePioche(partie);
-                decalagePioche(partie);
-                decalagePioche(partie);
-                decalagePioche(partie);
-            }
+                if (estPasse(recupererDerniereCarteTas(tas))) {
+                    partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
+                } else if (estPlus2(recupererDerniereCarteTas(tas))) {
+                    decalagePioche(partie);
+                    decalagePioche(partie);
+                } else if (estPlus4(recupererDerniereCarteTas(tas))) {
+                    decalagePioche(partie);
+                    decalagePioche(partie);
+                    decalagePioche(partie);
+                    decalagePioche(partie);
+                }
 
-            sendFifoCartes2(partie, cartes);
-            envoyerSignal1Joueur(partie->jouant);
-            envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
+                sendFifoCartes(partie, cartes, 0);
+                envoyerSignal1Joueur(partie->jouant);
 
+                envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
+
+            } else envoyerSignal2TousJoueurs(partie);
             break;
         case SIGUSR2:
-            //printf("sig recu sigusr2\n");
-
             decalagePioche(partie);
-
             partie->jouant = partie->joueur[joueurSuivant(partie, partie->jouant, inverse)];
-            sendFifoCartes2(partie, cartes);
+            sendFifoCartes(partie, cartes, 0);
             envoyerSignal1Joueur(partie->jouant);
             envoyerSignal2TousJoueursSauf1(*partie, partie->jouant);
             break;
@@ -216,7 +241,7 @@ void initTas(t_tas *tas) {
 }
 
 
-void sendFifo2(t_joueur joueur, t_carte *carte) {
+void sendFifo2(t_joueur joueur, t_carte *carte, int signal) {
     ROUGE;
     REINIT;
     t_carte *main;
@@ -224,7 +249,8 @@ void sendFifo2(t_joueur joueur, t_carte *carte) {
     cle = genererCleClient(joueur);
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
-    envoyerSignal1Joueur(joueur);
+    if (signal == 1)
+        envoyerSignal1Joueur(joueur);
 
 
 }
@@ -233,7 +259,7 @@ void sendFifo3(t_joueur joueur, t_carte *carte) {
     t_carte *main;
     key_t cle;
     cle = genererCleClient(joueur);
-    main = calloc(joueur.nombreCartes*30, sizeof(t_carte));
+    main = calloc(joueur.nombreCartes * 30, sizeof(t_carte));
     main = recupererMainPartagee(cle, joueur);
     copie(main, carte, joueur.nombreCartes);
 
@@ -266,6 +292,12 @@ void envoyerSignal2TousJoueursSauf1(t_partie partie, t_joueur joueur) {
     }
 }
 
+void envoyerSignal2TousJoueurs(t_partie *partie) {
+    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
+        envoyerSignal2Joueur(partie->joueur[i]);
+    }
+}
+
 void creerFichierTxt(t_joueur joueur) {
     char chaine[10];
     genererNomFichier(joueur, chaine);
@@ -279,7 +311,7 @@ void creerFichierTxt(t_joueur joueur) {
 }
 
 
-void sendFifoCartes(t_partie *partie, t_carte *mains) {
+void sendFifoCartes(t_partie *partie, t_carte *mains, int signal) {
     int positionActuelle = 0;
     int positionFinale = 0;
     for (int i = 1; i <= partie->nombreJoueurs; ++i) {
@@ -288,40 +320,11 @@ void sendFifoCartes(t_partie *partie, t_carte *mains) {
         positionActuelle = positionFinale;
         positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
         selectionneMain(positionActuelle, positionFinale, mains, cartes);
-        sendFifo2(partie->joueur[i], cartes);
         creerFichierTxt(partie->joueur[i]);
-        genererCleClient(partie->joueur[i]);
+        sendFifo2(partie->joueur[i], cartes, signal);
     }
 }
 
-void sendFifoCartes2(t_partie *partie, t_carte *mains) {
-    int positionActuelle = 0;
-    int positionFinale = 0;
-    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        printf("Joueur %d nombres de cartes %d\n", i, partie->joueur[i].nombreCartes);
-        t_carte cartes[partie->joueur[i].nombreCartes];
-        positionActuelle = positionFinale;
-        positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
-        selectionneMain(positionActuelle, positionFinale, mains, cartes);
-        creerFichierTxt(partie->joueur[i]);
-        sendFifo3(partie->joueur[i], cartes);
 
-    }
-}
-
-void sendFifoCartes3(t_partie *partie, t_carte *mains) {
-    int positionActuelle = 0;
-    int positionFinale = 0;
-    for (int i = 1; i <= partie->nombreJoueurs; ++i) {
-        printf("Joueur %d nombres de cartes %d\n", i, partie->joueur[i].nombreCartes);
-        t_carte cartes[partie->joueur[i].nombreCartes];
-        positionActuelle = positionFinale;
-        positionFinale = positionFinMainTableauMain(partie->joueur[i], positionActuelle);
-        selectionneMain(positionActuelle, positionFinale, mains, cartes);
-        creerFichierTxt(partie->joueur[i]);
-        sendFifo3(partie->joueur[i], cartes);
-        genererCleClient(partie->joueur[i]);
-    }
-}
 
 

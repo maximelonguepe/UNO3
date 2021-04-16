@@ -14,6 +14,38 @@ void affichageJoueurJouant(t_partie *partie) {
     printf("Joueur en train de jouer : %s\n", partie->joueur[partie->jouant.id].nom);
 }
 
+int estCarteNumero(t_carte carte,char * numero){
+    if(strcmp(carte.numero_carte,numero)==0){
+        return 1;
+    }
+    return 0;
+}
+int estPlus4(t_carte carte){
+    return estCarteNumero(carte,"+4");
+}
+
+int estCarteSpeciale(t_carte carte){
+    if (estCarteNumero(carte,"jo") || estCarteNumero(carte,"+4") ) {
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * permet de savoir si la carte envoyee en paramettre est passe
+ * @param carte
+ * @return
+ */
+
+int estPasse(t_carte carte){
+    return estCarteNumero(carte,"pa");
+}
+
+
+int estPlus2(t_carte carte){
+    return estCarteNumero(carte,"+2");
+}
+
 /**
  * Affiche le nom du joueur
  * @param joueur
@@ -198,6 +230,10 @@ void ajouterCarteTas(t_tas *tas, t_carte carte) {
 key_t genererCle(char *chaine) {
     key_t cle2 = ftok(chaine, 'R');
     return cle2;
+}
+
+key_t genererCleMessage() {
+    genererCle("message.txt");
 }
 
 /**

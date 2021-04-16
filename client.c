@@ -49,8 +49,7 @@ int main(int argc, char *argv[]) {
 
 
     printf("Nombre joueurs : %d \n", partie->nombreJoueurs);
-    printf("Vous avez l'id : %d \n", id);
-    printf("Vous avez le pid : %d\n", getpid());
+
 
     if (shmdt(partie) == -1) {
         perror("shmdt");
@@ -104,7 +103,13 @@ int main(int argc, char *argv[]) {
 
     void *ret;
     pthread_join(threadPartie, &ret);
-    print_milieu("fin de partie");
+    partie=recupererPartiePartagee(key);
+    print_milieu("fin de partie\n");
+    char chaine[100];
+    strcpy(chaine,"Joueur ayant gagné : ");
+    strcat(chaine,partie->jouant.nom);
+    print_milieu(chaine);
+
     return 0;
 
 }
