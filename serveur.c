@@ -52,8 +52,12 @@ int main(int argc, char *argv[]) {
     strcpy(partie->joueur[0].nom, "serveur");
 
     //tas = malloc(sizeof(t_tas));
-
-    while (partie->nombreJoueurs < NBJOUEUR) {
+    int nombreJoueurs;
+    if (argc>1){
+        nombreJoueurs=atoi(argv[1]);
+    } else nombreJoueurs=NBJOUEUR;
+    printf("En attente de %d joueurs \n",nombreJoueurs);
+    while (partie->nombreJoueurs < nombreJoueurs) {
         partie = shmat(shmid, (void *) 0, 0);
 
         sleep(2);
@@ -101,7 +105,7 @@ int main(int argc, char *argv[]) {
     void *ret;
     pthread_join(threadPartie, &ret);
     char chaine[10000];
-
+    clrscr();
     print_milieu("Partie terminee\n");
 }
 

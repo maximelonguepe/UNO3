@@ -8,15 +8,6 @@ volatile sig_atomic_t n_sigusr2 = 0;
 
 static void sig_handler(int);
 
-/*TODO : pour jouer une carte :
- * vérifier que la carte est presente dans la main du joueur
- * vérifier que la carte est possible a jouer
- * ajouter la carte au tas si elle est jouable
- * diminuer le nombre de cartes du joueur
- * reafficher propremment laffichage global des joueurs
- * */
-
-
 
 int main(int argc, char *argv[]) {
     t_envoi * envoi;
@@ -110,6 +101,7 @@ int main(int argc, char *argv[]) {
     strcat(chaine,partie->jouant.nom);
     print_milieu(chaine);
     scoreTotal(*partie,chaine);
+    clrscr();
     printf("%s",chaine);
     return 0;
 
