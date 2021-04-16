@@ -99,9 +99,9 @@ int main(int argc, char *argv[]) {
     char chaine[100];
     strcpy(chaine,"Joueur ayant gagné : ");
     strcat(chaine,partie->jouant.nom);
+    clrscr();
     print_milieu(chaine);
     scoreTotal(*partie,chaine);
-    clrscr();
     printf("%s",chaine);
     return 0;
 
