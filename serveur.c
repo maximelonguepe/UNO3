@@ -100,6 +100,8 @@ int main(int argc, char *argv[]) {
     sleep(10);
     void *ret;
     pthread_join(threadPartie, &ret);
+    char chaine[10000];
+
     print_milieu("Partie terminee\n");
 }
 

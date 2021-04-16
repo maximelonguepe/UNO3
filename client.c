@@ -109,7 +109,8 @@ int main(int argc, char *argv[]) {
     strcpy(chaine,"Joueur ayant gagné : ");
     strcat(chaine,partie->jouant.nom);
     print_milieu(chaine);
-
+    scoreTotal(*partie,chaine);
+    printf("%s",chaine);
     return 0;
 
 }

@@ -174,7 +174,7 @@ void MONSIGServer(int num) {
 
             int numero = numeroCarte(partie, partie->jouant, recupererDerniereCarteTas(tas));
             decalage(partie, numero, &partie->joueur[partie->jouant.id]);
-            if (strcmp(recupererDerniereCarteTas(tas).numero_carte, "in") == 0) {
+            if (estInv(recupererDerniereCarteTas(tas))) {
                 switch (inverse) {
                     case 0:
                         inverse = 1;
@@ -309,7 +309,6 @@ void creerFichierTxt(t_joueur joueur) {
     }
 
 }
-
 
 void sendFifoCartes(t_partie *partie, t_carte *mains, int signal) {
     int positionActuelle = 0;

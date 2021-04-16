@@ -33,9 +33,7 @@ typedef struct {
     t_carte cartes[108];
     int taille;
 } t_tas;
-typedef struct {
-    char message[10000];
-} t_message;
+
 
 key_t genererCleTas();
 
@@ -105,7 +103,9 @@ t_carte *recupererMainPartagee(key_t key, t_joueur joueur);
 
 int estPasse(t_carte carte);
 
+char *scoreTotal(t_partie partie,char *chaine);
 
+int estInv(t_carte carte);
 
 
 

@@ -14,18 +14,19 @@ void affichageJoueurJouant(t_partie *partie) {
     printf("Joueur en train de jouer : %s\n", partie->joueur[partie->jouant.id].nom);
 }
 
-int estCarteNumero(t_carte carte,char * numero){
-    if(strcmp(carte.numero_carte,numero)==0){
+int estCarteNumero(t_carte carte, char *numero) {
+    if (strcmp(carte.numero_carte, numero) == 0) {
         return 1;
     }
     return 0;
 }
-int estPlus4(t_carte carte){
-    return estCarteNumero(carte,"+4");
+
+int estPlus4(t_carte carte) {
+    return estCarteNumero(carte, "+4");
 }
 
-int estCarteSpeciale(t_carte carte){
-    if (estCarteNumero(carte,"jo") || estCarteNumero(carte,"+4") ) {
+int estCarteSpeciale(t_carte carte) {
+    if (estCarteNumero(carte, "jo") || estCarteNumero(carte, "+4")) {
         return 1;
     }
     return 0;
@@ -37,13 +38,13 @@ int estCarteSpeciale(t_carte carte){
  * @return
  */
 
-int estPasse(t_carte carte){
-    return estCarteNumero(carte,"pa");
+int estPasse(t_carte carte) {
+    return estCarteNumero(carte, "pa");
 }
 
 
-int estPlus2(t_carte carte){
-    return estCarteNumero(carte,"+2");
+int estPlus2(t_carte carte) {
+    return estCarteNumero(carte, "+2");
 }
 
 /**
@@ -232,9 +233,6 @@ key_t genererCle(char *chaine) {
     return cle2;
 }
 
-key_t genererCleMessage() {
-    genererCle("message.txt");
-}
 
 /**
  * renvoie la clé relative a chaque client
@@ -632,7 +630,7 @@ void MONSIG(int num) {
             //printf("Cle : %d\n",genererCleClient(partie->joueur[envoi->idClient]));
             main = recupererMainPartagee(cleMain, partie->joueur[envoi->idClient]);
             affichageClientPartieCommencee(partie, tas, main, envoi->idClient);
-            while ((existanceCarte == 0 || cartePresente == 0 || jouable == 0 )) {
+            while ((existanceCarte == 0 || cartePresente == 0 || jouable == 0)) {
                 if (erreurSaisie) {
                     ROUGE;
                     printf("Tapez une carte existante ! \n");
@@ -670,7 +668,7 @@ void MONSIG(int num) {
                     while (isCouleur == 0) {
                         printf("Quelle couleur voulez vous imposer : \n");
                         scanf("%s", reponse2);
-                        if (isCouleur=estCouleur(reponse2)) strcpy(tas->cartes[tas->taille - 1].couleur, reponse2);
+                        if (isCouleur = estCouleur(reponse2)) strcpy(tas->cartes[tas->taille - 1].couleur, reponse2);
 
                     }
 
@@ -679,7 +677,7 @@ void MONSIG(int num) {
 
 
             } else {
-            sendSigusr2Server(partie);
+                sendSigusr2Server(partie);
             }
             break;
         case SIGUSR2:
@@ -695,6 +693,51 @@ void MONSIG(int num) {
         default:
             break;
     }
+}
+
+int estInv(t_carte carte) {
+    return estCarteNumero(carte, "in");
+}
+
+int valeurCarteFinPartie(t_carte carte) {
+    if (estCarteSpeciale(carte)) {
+        return 50;
+    }
+    else if (estPlus2(carte)||estInv(carte)) {
+        return 20;
+    } else{
+        return atoi(carte.numero_carte);
+    }
+}
+
+char *scoreTotal(t_partie partie, char *chaine) {
+
+    strcpy(chaine, "");
+    for (int i = 1; i <= partie.nombreJoueurs; ++i) {
+        if (i != partie.jouant.id) {
+            int sommePoint = 0;
+            t_carte *cartesJoueurs;
+            cartesJoueurs = (t_carte *) calloc(partie.joueur[i].nombreCartes, sizeof(t_carte));
+            key_t cleJoueur = genererCleClient(partie.joueur[i]);
+
+            cartesJoueurs = recupererMainPartagee(cleJoueur, partie.joueur[i]);
+            for (int j = 0; j < partie.joueur[i].nombreCartes; ++j) {
+                sommePoint += valeurCarteFinPartie(cartesJoueurs[j]);
+
+            }
+            char str[4];
+            sprintf(str, "%d", sommePoint);
+            strcat(chaine, "Le joueur ");
+            strcat(chaine, partie.joueur[i].nom);
+            strcat(chaine, " finit avec un score de  ");
+            strcat(chaine, str);
+            strcat(chaine, "\n");
+        }
+
+
+    }
+
+    return chaine;
 }
 
 
